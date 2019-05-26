@@ -65,7 +65,7 @@ const WrappedNormalLoginForm = inject('store')(observer(withRouter(Form.create({
 class Login extends React.Component {
   render() {
     return (
-      <div style={{height: 'calc(100vh - 183px)', position: 'relative', backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover'}}>
+      <div style={{height: 'calc(100vh - 183px)', position: 'relative', backgroundImage: 'url(http://img.leikeji.com/resource/img/4c60dee2bc5849beae5b8a342c928563.jpg)', backgroundSize: 'cover'}}>
       <div style={{width: 400, float:'right', marginRight: '50px', marginTop: 50}}>
         <Card title={'用户登陆'}>
           <WrappedNormalLoginForm/>
