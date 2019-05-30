@@ -1,19 +1,40 @@
 import React from 'react';
 import {Button, Card, Divider, Icon, InputNumber, Modal, Switch, Table, Tag} from "antd";
+import { Row, Col, Progress } from 'antd';
 import {Breadcrumb} from "antd";
 import {Link} from "react-router-dom";
+import ParaRepetitionRateBar from './ParaRepetitionRateBar';
+import RepetitionArticleBar from './RepetitionArticleBar';
 import moment from "moment";
 import 'moment/min/locales'
+
 
 moment.locale('zh-cn');
 
 class CorpusInfo extends React.Component {
-  state = { visible: false };
+  state = {
+    visible: false ,
+    visualizationModel: false
+  };
+
   showModal = () => {
     this.setState({
       visible: true,
     });
   };
+
+  showVisualizationModel = () => {
+    this.setState({
+        visualizationModel: true,
+    });
+  };
+
+  handleOk = () => {
+    this.setState({
+        visualizationModel: false,
+    })
+  }
+
   render() {
     const data = [
       {
@@ -66,13 +87,15 @@ class CorpusInfo extends React.Component {
         ),
       },
       {
-        title: '下载报告 | 删除',
+        title: '下载报告 | 删除 | 统计',
         key: 'action',
         render: (text, record) => (
-          <span>
+        <span>
         <a href="javascript:;" title={'下载报告'}><Icon type="download"/></a>
         <Divider type="vertical"/>
         <a href="javascript:;" title={'删除'}><Icon type="delete"/></a>
+        <Divider type="vertical"/>
+        <a href="javascript:;" title={'统计'} onClick={this.showVisualizationModel}><Icon type="eye"/></a>
       </span>
         ),
       },
@@ -110,6 +133,57 @@ class CorpusInfo extends React.Component {
             onChange={() => {}}
           /></p>
         </Modal>
+          <Modal
+              title="查重统计"
+              visible={this.state.visualizationModel}
+              onOk={this.handleOk}
+              onCancel={this.handleCancel}
+              width='1500px'
+          >
+              <Row gutter={16}>
+                  <Col span={10}>
+                      <Row>
+                          <Card title="重复率"  >
+                              <div style={{textAlign:'center'}}>
+                                  <Progress type="circle" percent={75}/>
+                              </div>
+                          </Card>
+                      </Row>
+                      <Row style={{marginTop:'20px'}}>
+                          <Card title="段落重复率"  >
+                              <ParaRepetitionRateBar />
+                          </Card>
+                      </Row>
+                  </Col>
+                  <Col span={14}>
+                      <Card title="重复率散点图">
+                          <RepetitionArticleBar />
+                      </Card>
+                  </Col>
+              </Row>
+          </Modal>
+
+
+        {/*<Modal*/}
+          {/*title="查重统计"*/}
+          {/*visible={this.state.visualizationModel}*/}
+          {/*onOk={this.handleOk}*/}
+          {/*onCancel={this.handleCancel}*/}
+          {/*style={{width:'2000px'}}*/}
+        {/*>*/}
+                {/*<Row gutter={16}>*/}
+                    {/*<Col span={12}>*/}
+                        {/*<Card title="柱状图" >*/}
+                            {/*/!*<VisualizationBar />*!/*/}
+                        {/*</Card>*/}
+                    {/*</Col>*/}
+                    {/*<Col span={12}>*/}
+                        {/*<Card title="柱状图" >*/}
+                            {/*<VisualizationBar />*/}
+                        {/*</Card>*/}
+                    {/*</Col>*/}
+                {/*</Row>*/}
+        {/*</Modal>*/}
       </div>
     )
   }
