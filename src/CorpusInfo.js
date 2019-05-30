@@ -34,6 +34,11 @@ class CorpusInfo extends React.Component {
         visualizationModel: false,
     })
   }
+    handleCancel= () => {
+        this.setState({
+            visualizationModel: false,
+        })
+    }
 
   render() {
     const data = [
