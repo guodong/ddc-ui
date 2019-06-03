@@ -143,10 +143,10 @@ class CorpusInfo extends React.Component {
               visible={this.state.visualizationModel}
               onOk={this.handleOk}
               onCancel={this.handleCancel}
-              width='1500px'
+              width='1200px'
           >
               <Row gutter={16}>
-                  <Col span={10}>
+                  <Col span={12}>
                       <Row>
                           <Card title="重复率"  >
                               <div style={{textAlign:'center'}}>
@@ -160,7 +160,7 @@ class CorpusInfo extends React.Component {
                           </Card>
                       </Row>
                   </Col>
-                  <Col span={14}>
+                  <Col span={12}>
                       <Card title="重复率散点图">
                           <RepetitionArticleBar />
                       </Card>

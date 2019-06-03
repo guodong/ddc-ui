@@ -1,14 +1,11 @@
-import {types, flow, getRoot} from 'mobx-state-tree';
-
-export const Store = types.model({
-  is_login: localStorage.getItem('isLogin') ? true : false
+import { FileStore } from './filestore';
+import {types} from 'mobx-state-tree';
+import { logInStore } from './logInStore';
+export const Store = types.model('Store',{
+    logInStore: types.optional(logInStore,{}),
+    FileStore: types.optional(FileStore,{})
 }).views(self => ({
-  get isLogin() {
-    return self.is_login
-  }
-})).actions(self => ({
-  setIsLogin(flag) {
-    self.is_login = flag
-    localStorage.setItem('isLogin', flag)
-  }
-}))
+
+})).actions(self => {
+    return {}
+})

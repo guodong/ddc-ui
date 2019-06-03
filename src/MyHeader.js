@@ -19,7 +19,7 @@ class MyHeader extends React.Component {
           <a href="#"><Icon type="info-circle"/> 个人信息</a>
         </Menu.Item>
         <Menu.Divider/>
-        <Menu.Item key="logout"><Icon type="logout"/> 退出</Menu.Item>
+        <Menu.Item key="logout"><Icon type="logout" /> 退出</Menu.Item>
       </Menu>
     );
     return (

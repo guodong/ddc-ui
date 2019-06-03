@@ -3,10 +3,18 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import {Store} from "./store";
+// import {Store} from "./store/logInStore";
+// import  { Store } from "./store";
+import  {Store} from "./store/index";
+import {onSnapshot} from "mobx-state-tree";
 import {Provider} from "mobx-react";
 
+
 const store = Store.create();
+
+onSnapshot(store, (snapshot) => {
+    console.dir(JSON.stringify(snapshot))
+})
 
 ReactDOM.render(<Provider store={store}><App/></Provider>, document.getElementById('root'));
 

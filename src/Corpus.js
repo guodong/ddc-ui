@@ -2,136 +2,178 @@ import React from 'react';
 import {Button, Card, Divider, Icon, Modal, Table, Upload, message, Switch, Input, Row, Col} from "antd";
 import {Breadcrumb} from "antd";
 import {Link} from "react-router-dom";
+import {inject, observer} from "mobx-react";
 import moment from 'moment';
-import 'moment/min/locales'
+import 'moment/min/locales';
 
 moment.locale('zh-cn');
 
-const columns = [
-  {
-    title: 'id',
-    dataIndex: 'name',
-    key: 'name',
-    render: (text, record, idx) => idx,
-  },
-  {
-    title: '文档名称',
-    dataIndex: 'name',
-    key: 'name',
-    render: (text, record) => <Link to={`/corpus/${record.key}`}>{text}</Link>,
-  },
-  {
-    title: '导入时间',
-    dataIndex: 'age',
-    key: 'age',
-    render: t => moment().format('YYYY MMMM Do, a h:mm:ss')
-  },
-  {
-    title: '查重次数',
-    dataIndex: 'age',
-    key: 'age',
-    render: t => 2
-  },
-  {
-    title: '加入语料库',
-    key: 'action',
-    render: (text, record) => (
-      <span>
-        <Switch defaultChecked onChange={() => {}} />
-      </span>
-    ),
-  },
-  {
-    title: '下载 | 删除',
-    key: 'action',
-    render: (text, record) => (
-      <span>
-        <a href="javascript:;" title={'下载'}><Icon type="download" /></a>
-        <Divider type="vertical"/>
-        <a href="javascript:;" title={'删除'}><Icon type="delete" /></a>
-      </span>
-    ),
-  },
-];
+// const data = [
+//   {
+//     key: '1',
+//     name: 'XX项目申请书.doc',
+//     age: new Date().toDateString(),
+//     address: 'New York No. 1 Lake Park',
+//     tags: ['nice', 'developer'],
+//   },
+//   {
+//     key: '2',
+//     name: 'XX项目申请书.pdf',
+//     age: 42,
+//     address: 'London No. 1 Lake Park',
+//     tags: ['loser'],
+//   },
+//   {
+//     key: '3',
+//     name: 'XX项目申请书.docx',
+//     age: 32,
+//     address: 'Sidney No. 1 Lake Park',
+//     tags: ['cool', 'teacher'],
+//   },
+//   {
+//     key: '14',
+//     name: 'XX项目申请书.doc',
+//     age: new Date().toDateString(),
+//     address: 'New York No. 1 Lake Park',
+//     tags: ['nice', 'developer'],
+//   },
+//   {
+//     key: '25',
+//     name: 'XX项目申请书.pdf',
+//     age: 42,
+//     address: 'London No. 1 Lake Park',
+//     tags: ['loser'],
+//   },
+//   {
+//     key: '36',
+//     name: 'XX项目申请书.docx',
+//     age: 32,
+//     address: 'Sidney No. 1 Lake Park',
+//     tags: ['cool', 'teacher'],
+//   },
+//   {
+//     key: '17',
+//     name: 'XX项目申请书.doc',
+//     age: new Date().toDateString(),
+//     address: 'New York No. 1 Lake Park',
+//     tags: ['nice', 'developer'],
+//   },
+//   {
+//     key: '28',
+//     name: 'XX项目申请书.pdf',
+//     age: 42,
+//     address: 'London No. 1 Lake Park',
+//     tags: ['loser'],
+//   },
+//   {
+//     key: '39',
+//     name: 'XX项目申请书.docx',
+//     age: 32,
+//     address: 'Sidney No. 1 Lake Park',
+//     tags: ['cool', 'teacher'],
+//   },
+// ];
 
-const data = [
-  {
-    key: '1',
-    name: 'XX项目申请书.doc',
-    age: new Date().toDateString(),
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'XX项目申请书.pdf',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'XX项目申请书.docx',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-  {
-    key: '14',
-    name: 'XX项目申请书.doc',
-    age: new Date().toDateString(),
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '25',
-    name: 'XX项目申请书.pdf',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '36',
-    name: 'XX项目申请书.docx',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-  {
-    key: '17',
-    name: 'XX项目申请书.doc',
-    age: new Date().toDateString(),
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '28',
-    name: 'XX项目申请书.pdf',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '39',
-    name: 'XX项目申请书.docx',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+
 
 class Corpus extends React.Component {
-  state = {
-    selectedRowKeys: [], // Check here to configure the default column
-    visible: false
-  };
+    constructor(props){
+        super(props);
+        this.state = {
+            selectedRowKeys: [], // Check here to configure the default column
+            visible: false,
+            data: [],
+        };
+    }
+
+
+  componentDidMount(){
+        console.log("5555555",this.props.store.FileStore);
+        // this.props.store.FileStore.getResourcesList('admin').then(res =>{
+        //     this.setColumnData(this.props.store.filestore.resourceList);
+        // })
+  }
+
+    setColumnData(resultArr){
+        const arr = [];
+        resultArr.map((res) => {
+            const result = {};
+            result.name = res.title;
+            result.age = res.createTime;
+            arr.push(result);
+        })
+        this.setState({
+            data: arr,
+        })
+    }
 
   onSelectChange = selectedRowKeys => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     this.setState({ selectedRowKeys });
   };
 
+  getResource(currentUser){
+    this.props.store.filestore.getResourcesList(currentUser);
+  }
+
+  handleDelete = (name) => {
+
+  }
+
+  handleDownload = () => {
+
+  }
+
+
   render() {
+      const  { data } = this.state;
+      const columns = [
+          {
+              title: 'id',
+              dataIndex: 'name',
+              key: 'name',
+              render: (text, record, idx) => idx,
+          },
+          {
+              title: '文档名称',
+              dataIndex: 'name',
+              key: 'name',
+              render: (text, record) => <Link to={`/corpus/${record.key}`}>{text}</Link>,
+          },
+          {
+              title: '导入时间',
+              dataIndex: 'age',
+              key: 'age',
+              render: t => moment().format('YYYY MMMM Do, a h:mm:ss')
+          },
+          {
+              title: '查重次数',
+              dataIndex: 'age',
+              key: 'age',
+              render: t => 2
+          },
+          {
+              title: '加入语料库',
+              key: 'action',
+              render: (text, record) => (
+                  <span>
+        <Switch defaultChecked onChange={() => {}} />
+      </span>
+              ),
+          },
+          {
+              title: '下载 | 删除',
+              key: 'action',
+              render: (text, record) => (
+                  <span>
+        <a href="javascript:;" title={'下载'} onClick={this.handleDownload(record.name)}><Icon type="download" /></a>
+        <Divider type="vertical"/>
+        <a href="javascript:;" title={'删除'} onClick={this.handleDelete(record.name)}><Icon type="delete" /></a>
+      </span>
+              ),
+          },
+      ];
+
     const { selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
@@ -166,11 +208,14 @@ class Corpus extends React.Component {
     };
 
     const props = {
-      name: 'file',
-      action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-      headers: {
-        authorization: 'authorization-text',
-      },
+        customRequest: ({file}) => {
+            console.log("2222222",file);
+            this.props.store.fiestore.upLoadFile(file).then(res => {
+                if(res.status === 200){
+                    message.success("上传成功");
+                }
+            })
+        },
       onChange(info) {
         if (info.file.status !== 'uploading') {
           console.log(info.file, info.fileList);
@@ -182,6 +227,7 @@ class Corpus extends React.Component {
         }
       },
     };
+
     return (
       <div>
         <Breadcrumb style={{margin: '16px 0'}}>
@@ -218,4 +264,4 @@ class Corpus extends React.Component {
   }
 }
 
-export default Corpus;
+export default inject('store')(observer(Corpus));
