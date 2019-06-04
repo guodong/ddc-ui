@@ -5,8 +5,6 @@ export const File = types
     .model('File',{
         createTime : types.string,
         title: types.string,
-        ddcProperties: types.string,
-        filePath: types.string,
         id: types.string,
         isCorpus: types.number,
         size: types.string,
@@ -29,8 +27,6 @@ export const FileStore = types
             self.resourceList.push({
                 createTime: file.createTime,
                 title: file.title,
-                ddcProperties: file.ddcProperties,
-                filePath: file.filePath,
                 id: file.id,
                 isCorpus: file.isCorpus,
                 size: file.size,
@@ -69,6 +65,7 @@ export const FileStore = types
                         'Authorization':localStorage.getItem('token'),
                     }
                 }).then(response =>  response.json());
+                console.log("9999999999",response);
                 return updateResourceList(response.data.records);
             }catch (error) {
                 console.log("Failed to get resourcelist",error);
@@ -82,7 +79,7 @@ export const FileStore = types
             try{
                 const response = yield fetch('http://192.168.4.119:9000/documents/upload',{
                     headers:{
-                        'Content-Type': 'multipart/form-data',
+                        // 'Content-Type': 'multipart/form-data',
                         'Authorization':localStorage.getItem('token'),
                     },
                     method: 'POST',

@@ -89,16 +89,10 @@ class Corpus extends React.Component {
 
   componentDidMount(){
         this.props.store.FileStore.getResourcesList().then(res => {
-            const resourceList = res.toJSON();
+            // const resourceList = res.toJSON();
             this.setColumnData(this.props.store.FileStore.resourceList);
-            console.log("44444444444",resourceList);
+            // console.log("44444444444",this.props.store.FileStore.resourceList);
         });
-        // console.log("555555555555",this.props.store.FileStore.resourceList[0]);
-        // this.setColumnData(this.props.store.FileStore.resourceList[0]);
-
-        // this.props.store.FileStore.getResourcesList('admin').then(res =>{
-        //     this.setColumnData(this.props.store.filestore.resourceList);
-        // })
   }
 
     setColumnData(resultArr){
@@ -118,10 +112,6 @@ class Corpus extends React.Component {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     this.setState({ selectedRowKeys });
   };
-
-  getResource(currentUser){
-    this.props.store.filestore.getResourcesList();
-  }
 
   handleDelete = (name) => {
 
@@ -216,15 +206,18 @@ class Corpus extends React.Component {
 
     const props = {
         customRequest: ({file}) => {
-            console.log("2222222",file);
             this.props.store.FileStore.upLoadFile(file).then(res => {
                 if(res.status === 200){
                     message.success("上传成功");
+                    this.props.store.FileStore.getResourcesList().then(res => {
+                        this.setColumnData(this.props.store.FileStore.resourceList);
+                    });
                 }
             })
         },
       onChange(info) {
         if (info.file.status !== 'uploading') {
+          console.log("4567890",info.file);
           console.log(info.file, info.fileList);
         }
         if (info.file.status === 'done') {
@@ -244,7 +237,7 @@ class Corpus extends React.Component {
         <Card title={'文档中心'}>
           <Row gutter={16}>
             <Col span={6} >
-              <Upload {...props} style={{display: 'inline-block'}}>
+              <Upload howUploadList={false} {...props} style={{display: 'inline-block'}}>
                 <Button type={'primary'}>
                   <Icon type="upload" /> 上传文档
                 </Button>
