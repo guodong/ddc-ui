@@ -88,7 +88,14 @@ class Corpus extends React.Component {
 
 
   componentDidMount(){
-        console.log("5555555",this.props.store.FileStore);
+        this.props.store.FileStore.getResourcesList().then(res => {
+            const resourceList = res.toJSON();
+            this.setColumnData(this.props.store.FileStore.resourceList);
+            console.log("44444444444",resourceList);
+        });
+        // console.log("555555555555",this.props.store.FileStore.resourceList[0]);
+        // this.setColumnData(this.props.store.FileStore.resourceList[0]);
+
         // this.props.store.FileStore.getResourcesList('admin').then(res =>{
         //     this.setColumnData(this.props.store.filestore.resourceList);
         // })
@@ -113,7 +120,7 @@ class Corpus extends React.Component {
   };
 
   getResource(currentUser){
-    this.props.store.filestore.getResourcesList(currentUser);
+    this.props.store.filestore.getResourcesList();
   }
 
   handleDelete = (name) => {
@@ -210,7 +217,7 @@ class Corpus extends React.Component {
     const props = {
         customRequest: ({file}) => {
             console.log("2222222",file);
-            this.props.store.fiestore.upLoadFile(file).then(res => {
+            this.props.store.FileStore.upLoadFile(file).then(res => {
                 if(res.status === 200){
                     message.success("上传成功");
                 }

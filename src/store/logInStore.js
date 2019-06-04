@@ -29,18 +29,18 @@ export const logInStore = types.model('logInStore',{
       payload.account = userName;
       payload.password = passWord;
       // payload.password = md5(passWord);
-      // const response = yield fetch('http://192.168.4.119:9000/auth',{
-      //   headers: {
-      //     Accept: 'application/json',
-      //     'Content-Type': 'application/json',
-      //   },
-      //     method: 'POST',
-      //     body: JSON.stringify(payload)
-      // }).then(resp => resp.json());
-      const response = yield request('http://192.168.4.119:9000/auth',{
-            method: 'POST',
-            body: payload,
-        });
+      const response = yield fetch('http://192.168.4.119:9000/auth',{
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+          method: 'POST',
+          body: JSON.stringify(payload)
+      }).then(resp => resp.json());
+      // const response = yield request('http://192.168.4.119:9000/auth',{
+      //       method: 'POST',
+      //       body: payload,
+      //   });
       if(isNull(response.data)){
         notification.error({
             message: '后端的锅，找老毕解决赶快解决，别再找前端了。。。。',
