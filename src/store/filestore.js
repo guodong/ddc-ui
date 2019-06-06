@@ -36,7 +36,6 @@ export const FileStore = types
                 userId: file.userId,
                 version: file.version,
             });
-            console.log('777777777777',self.store.FileStore.resourceList.length);
         }
 
         function updateResourceList(json){
@@ -48,14 +47,22 @@ export const FileStore = types
             return self.resourceList;
         }
 
+        const deleteResource = flow(function* (fileId) {
+            try{
+                const response = yield fetch(`http://192.168.4.119:9000/documents/${fileId}`,{
+                    headers:{
+                        'Authorization':localStorage.getItem('token'),
+                    },
+                    method : 'DELETE',
+                });
+                return response.json();
+            }catch (error) {
+                    console.log("Failed to delete resourcelist",error);
+            }
+        })
+
         const getResourcesList = flow(function* () {
             try{
-                // const response = yield fetch('http://192.168.4.119:9000/documents/page/${param}',{
-                //     method:'GET',
-                //
-                // }).then(resp => resp.json());
-
-                // const response = yield request('http://192.168.4.119:9000/documents/page');
                 self.resourceList = [];
                 const response = yield fetch('http://192.168.4.119:9000/documents/page',{
                     method:'GET',
@@ -65,10 +72,22 @@ export const FileStore = types
                         'Authorization':localStorage.getItem('token'),
                     }
                 }).then(response =>  response.json());
-                console.log("9999999999",response);
                 return updateResourceList(response.data.records);
             }catch (error) {
                 console.log("Failed to get resourcelist",error);
+            }
+        })
+
+        const downLoadFile = flow(function* (payload) {
+            try{
+                const response = fetch(`http://192.168.4.119:9000/documents/${payload.id}/download`,{
+                    headers:{
+                        'Authorization':localStorage.getItem('token'),
+                    },
+                });
+                return response;
+            }catch (error) {
+                console.log("failed to download file",error) ;
             }
         })
 
@@ -96,5 +115,7 @@ export const FileStore = types
             upLoadFile,
             pushResourceList,
             updateResourceList,
+            downLoadFile,
+            deleteResource,
         }
     })

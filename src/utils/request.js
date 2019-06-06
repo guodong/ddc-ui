@@ -21,7 +21,6 @@ export default function request (url ,options) {
                 'Access-Control-Allow-Headers': 'authorization,content-type',
                 ...newOptions.headers,
             };
-            console.log("777777777",newOptions.headers);
             newOptions.body = JSON.stringify(newOptions.body);
         } else {
             // newOptions.body is FormData
@@ -35,7 +34,6 @@ export default function request (url ,options) {
         // newOptions.headers = newOptions.headers || {};
         // newOptions.headers.Authorization = getLocalData('token');
         newOptions.headers.Authorization = localStorage.getItem('token');
-        console.log("44444444",localStorage.getItem('token'));
     }
     console.log("00000",newOptions);
     return(

@@ -91,7 +91,6 @@ class Corpus extends React.Component {
         this.props.store.FileStore.getResourcesList().then(res => {
             // const resourceList = res.toJSON();
             this.setColumnData(this.props.store.FileStore.resourceList);
-            // console.log("44444444444",this.props.store.FileStore.resourceList);
         });
   }
 
@@ -101,6 +100,7 @@ class Corpus extends React.Component {
             const result = {};
             result.name = res.title;
             result.age = res.createTime;
+            result.id = res.id;
             arr.push(result);
         })
         this.setState({
@@ -113,13 +113,33 @@ class Corpus extends React.Component {
     this.setState({ selectedRowKeys });
   };
 
-  handleDelete = (name) => {
-
+  handleDelete = (record) => {
+      this.props.store.FileStore.deleteResource(record.id).then(response =>{
+            if (response.status === 200){
+                this.props.store.FileStore.getResourcesList().then(res => {
+                    this.setColumnData(this.props.store.FileStore.resourceList);
+                });
+            }
+          }
+      )
   }
 
-  handleDownload = () => {
 
+  handleDownload = (obj) => {
+      this.props.store.FileStore.downLoadFile(obj).then((response)=>{
+          response.blob().then((blob) =>{
+              let a = document.createElement('a');
+              let bolbUrl = window.URL.createObjectURL(blob);
+              let fileName = obj.name;
+              a.href = bolbUrl;
+              a.download = fileName;
+              a.click();
+              window.URL.revokeObjectURL(bolbUrl);
+              a = null;
+          })
+      })
   }
+
 
 
   render() {
@@ -163,9 +183,9 @@ class Corpus extends React.Component {
               key: 'action',
               render: (text, record) => (
                   <span>
-        <a href="javascript:;" title={'下载'} onClick={this.handleDownload(record.name)}><Icon type="download" /></a>
+        <a href="javascript:;" title={'下载'} onClick={() => this.handleDownload(record)} ><Icon type="download"/></a>
         <Divider type="vertical"/>
-        <a href="javascript:;" title={'删除'} onClick={this.handleDelete(record.name)}><Icon type="delete" /></a>
+        <a href="javascript:;" title={'删除'} onClick={() => this.handleDelete(record)}><Icon type="delete" /></a>
       </span>
               ),
           },
@@ -214,18 +234,18 @@ class Corpus extends React.Component {
                     });
                 }
             })
-        },
-      onChange(info) {
-        if (info.file.status !== 'uploading') {
-          console.log("4567890",info.file);
-          console.log(info.file, info.fileList);
         }
-        if (info.file.status === 'done') {
-          message.success(`${info.file.name} file uploaded successfully`);
-        } else if (info.file.status === 'error') {
-          message.error(`${info.file.name} file upload failed.`);
-        }
-      },
+      // onChange(info) {
+      //   if (info.file.status !== 'uploading') {
+      //     console.log("4567890",info.file);
+      //     console.log(info.file, info.fileList);
+      //   }
+      //   if (info.file.status === 'done') {
+      //     message.success(`${info.file.name} file uploaded successfully`);
+      //   } else if (info.file.status === 'error') {
+      //     message.error(`${info.file.name} file upload failed.`);
+      //   }
+      // },
     };
 
     return (
@@ -237,7 +257,7 @@ class Corpus extends React.Component {
         <Card title={'文档中心'}>
           <Row gutter={16}>
             <Col span={6} >
-              <Upload howUploadList={false} {...props} style={{display: 'inline-block'}}>
+              <Upload howUploadList={false} showUploadList={false} {...props} style={{display: 'inline-block'}}>
                 <Button type={'primary'}>
                   <Icon type="upload" /> 上传文档
                 </Button>
