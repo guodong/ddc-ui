@@ -29,7 +29,7 @@ export const logInStore = types.model('logInStore',{
       payload.account = userName;
       payload.password = passWord;
       // payload.password = md5(passWord);
-      const response = yield fetch('http://192.168.4.119:9000/auth',{
+      const response = yield fetch('http://192.168.2.2:9000/auth',{
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',

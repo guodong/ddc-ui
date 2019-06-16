@@ -7,21 +7,71 @@ import ParaRepetitionRateBar from './ParaRepetitionRateBar';
 import RepetitionArticleBar from './RepetitionArticleBar';
 import moment from "moment";
 import 'moment/min/locales'
+import {inject, observer} from "mobx-react";
 
 
 moment.locale('zh-cn');
 
 class CorpusInfo extends React.Component {
-  state = {
-    visible: false ,
-    visualizationModel: false
-  };
+
+    constructor(props){
+        super(props);
+        this.state={
+        visible: false,
+        visualizationModel: false,
+        checkData: [],
+        documentDetail: {},
+        data: [],
+    }
+}
+
+    componentDidMount(){
+        this.props.store.corpusStore.getCorpusById(this.props.match.params.id).then(res => {
+            let document = {
+                documentTitle : this.props.store.corpusStore.corpusDetail.documentSaveName,
+                paragraphAmount: this.props.store.corpusStore.corpusDetail.paragraph,
+                documentSize: this.bytesToSize(parseInt(this.props.store.corpusStore.corpusDetail.fileSize)),
+            };
+            this.setState({
+                documentDetail: document,
+            });
+        });
+
+        this.props.store.corpusStore.getCheckList(this.props.match.params.id).then(res => {
+            this.setColumnData(this.props.store.corpusStore.checkList);
+        })
+    }
+
+    setColumnData(resultArr){
+        const arr = [];
+        resultArr.map((res) => {
+            const result = {};
+            result.repetitionRate = res.repetitionRate;
+            result.compareAccount = res.compareAccount;
+            result.documentId = res.documentId;
+            result.createTime = res.createTime;
+            arr.push(result);
+        })
+        this.setState({
+            data: arr,
+        })
+    }
 
   showModal = () => {
     this.setState({
       visible: true,
     });
   };
+
+
+    bytesToSize(bytes){
+        if(bytes === 0){
+            return '0B';
+        }
+        let k = 1024,sizes=['B','KB','MB','GB','TB','PB','ZB','YB'];
+        let i = Math.floor(Math.log(bytes)/Math.log(k));
+        return (bytes/Math.pow(k,i)).toFixed(1)+ '' +sizes[i];
+    }
 
   showVisualizationModel = () => {
     this.setState({
@@ -34,29 +84,41 @@ class CorpusInfo extends React.Component {
         visualizationModel: false,
     })
   }
+
     handleCancel= () => {
         this.setState({
             visualizationModel: false,
         })
     }
 
+    handleDownload = (obj) => {
+        this.props.store.corpusStore.downLoadFile(obj).then((response)=>{
+            response.blob().then((blob) =>{
+                let a = document.createElement('a');
+                let bolbUrl = window.URL.createObjectURL(blob);
+                let fileName = obj.name;
+                a.href = bolbUrl;
+                a.download = fileName;
+                a.click();
+                window.URL.revokeObjectURL(bolbUrl);
+                a = null;
+            })
+        })
+    }
+
+    handleDelete = (record) => {
+        this.props.store.corpusStore.deleteResource(record.id).then(response =>{
+                if (response.status === 200){
+                    this.props.store.FileStore.getResourcesList().then(res => {
+                        this.setColumnData(this.props.store.corpusStore.checkList);
+                    });
+                }
+            }
+        )
+    }
+
+
   render() {
-    const data = [
-      {
-        key: '1',
-        name: 'XX项目申请书.doc',
-        age: new Date().toDateString(),
-        address: 'New York No. 1 Lake Park',
-        tags: ['nice', 'developer'],
-      },
-      {
-        key: '2',
-        name: 'XX项目申请书.pdf',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        tags: ['loser'],
-      }
-    ]
     const columns = [
       {
         title: 'id',
@@ -66,20 +128,18 @@ class CorpusInfo extends React.Component {
       },
       {
         title: '查重阈值',
-        dataIndex: 'age',
-        key: 'age',
-        render: t => '80%'
+        dataIndex: 'repetitionRate',
+        key: 'repetitionRate',
       },
       {
         title: '对比文档数量',
-        dataIndex: 'age',
-        key: 'age',
-        render: t => 105
+        dataIndex: 'compareAccount',
+        key: 'compareAccount',
       },
       {
         title: '创建时间',
-        dataIndex: 'age',
-        key: 'age',
+        dataIndex: 'createTime',
+        key: 'createTime',
         render: t => moment().format('YYYY MMMM Do, a h:mm:ss')
       },
       {
@@ -87,7 +147,7 @@ class CorpusInfo extends React.Component {
         key: 'action',
         render: (text, record) => (
           <span>
-        <Tag color="blue">运行中</Tag>
+        <Tag color="blue">{record.isFinished ? '已结束' : '运行中'}</Tag>
       </span>
         ),
       },
@@ -96,15 +156,17 @@ class CorpusInfo extends React.Component {
         key: 'action',
         render: (text, record) => (
         <span>
-        <a href="javascript:;" title={'下载报告'}><Icon type="download"/></a>
+        <a href="javascript:;" title={'下载报告'} onClick={() => this.handleDownload(record)}><Icon type="download"/></a>
         <Divider type="vertical"/>
-        <a href="javascript:;" title={'删除'}><Icon type="delete"/></a>
+        <a href="javascript:;" title={'删除'} onClick={() => this.handleDelete(record)} ><Icon type="delete"/></a>
         <Divider type="vertical"/>
         <a href="javascript:;" title={'统计'} onClick={this.showVisualizationModel}><Icon type="eye"/></a>
       </span>
         ),
       },
     ];
+    // const  { corpusDetail }  = this.props.store.corpusStore.corpusDetail;
+      const { documentDetail, data } = this.state;
 
     return (
       <div>
@@ -114,9 +176,9 @@ class CorpusInfo extends React.Component {
         </Breadcrumb>
         <Card title={'文档信息'}>
           <p>文档名称：
-            <a href="javascript:;" title={'下载报告'}>XX项目申请文档.doc <Icon type="download"/></a></p>
-          <p>段落数量：308</p>
-          <p>文档大小：2.4MB</p>
+            <a href="javascript:;" title={'下载报告'}>{documentDetail.documentTitle}<Icon type="download"/></a></p>
+          <p>段落数量：{documentDetail.paragraphAmount}</p>
+          <p>文档大小：{documentDetail.documentSize}</p>
         </Card>
         <Card title={'查重任务'} style={{marginTop: 30}}>
           <Button style={{float: 'right'}}><Icon type="reload"/> 刷新</Button>
@@ -194,4 +256,5 @@ class CorpusInfo extends React.Component {
   }
 }
 
-export default CorpusInfo;
+export default inject('store')(observer(CorpusInfo));
+

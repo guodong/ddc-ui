@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, Card, Divider, Icon, Modal, Table, Upload, message, Switch, Input, Row, Col} from "antd";
-import {Breadcrumb} from "antd";
+import {Breadcrumb, Spin} from "antd";
 import {Link} from "react-router-dom";
 import {inject, observer} from "mobx-react";
 import moment from 'moment';
@@ -83,13 +83,13 @@ class Corpus extends React.Component {
             selectedRowKeys: [], // Check here to configure the default column
             visible: false,
             data: [],
+            isLoading: false,
         };
     }
 
 
-  componentDidMount(){
+    componentWillMount(){
         this.props.store.FileStore.getResourcesList().then(res => {
-            // const resourceList = res.toJSON();
             this.setColumnData(this.props.store.FileStore.resourceList);
         });
   }
@@ -108,10 +108,12 @@ class Corpus extends React.Component {
         })
     }
 
-  onSelectChange = selectedRowKeys => {
+
+    onSelectChange = selectedRowKeys => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     this.setState({ selectedRowKeys });
-  };
+  }
+
 
   handleDelete = (record) => {
       this.props.store.FileStore.deleteResource(record.id).then(response =>{
@@ -123,7 +125,6 @@ class Corpus extends React.Component {
           }
       )
   }
-
 
   handleDownload = (obj) => {
       this.props.store.FileStore.downLoadFile(obj).then((response)=>{
@@ -140,10 +141,28 @@ class Corpus extends React.Component {
       })
   }
 
+    isAddCategory = (checked,record) => {
+        this.state.isLoading = true;
+        if(checked){
+            this.props.store.FileStore.addCorpus(record.id).then(response =>{
+                if(response.status === 200){
+                    console.log(" add success");
+                }
+            })
+        }else {
+            this.props.store.FileStore.removeCorpus(record.id).then(response =>{
+                if(response.status === 200){
+                    this.state.isLoading = false;
+                    console.log(" remove success");
+                }
+            })
+        }
+}
+
 
 
   render() {
-      const  { data } = this.state;
+      const  { data,isLoading} = this.state;
       const columns = [
           {
               title: 'id',
@@ -155,7 +174,7 @@ class Corpus extends React.Component {
               title: '文档名称',
               dataIndex: 'name',
               key: 'name',
-              render: (text, record) => <Link to={`/corpus/${record.key}`}>{text}</Link>,
+              render: (text, record) => <Link to={`/corpus/${record.id}`}>{text}</Link>,
           },
           {
               title: '导入时间',
@@ -172,11 +191,9 @@ class Corpus extends React.Component {
           {
               title: '加入语料库',
               key: 'action',
-              render: (text, record) => (
-                  <span>
-        <Switch defaultChecked onChange={() => {}} />
-      </span>
-              ),
+              render: (text,record) =>(<span>
+                  {isLoading  ? (<Spin size='small'/> ) :(<Switch defaultChecked={false} onChange={(checked) => this.isAddCategory(checked,record)} />)}
+              </span>),
           },
           {
               title: '下载 | 删除',
