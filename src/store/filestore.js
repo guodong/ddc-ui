@@ -1,10 +1,11 @@
 import {types, flow, getRoot, getParent} from 'mobx-state-tree';
 import request from '../utils/request';
+import { stringify } from 'qs';
+
 
 export const File = types
     .model('File',{
         createTime : types.string,
-        documentSaveName: types.string,
         ext: types.string,
         fileSize: types.string,
         id: types.string,
@@ -20,15 +21,19 @@ export const File = types
 export const FileStore = types
     .model('FileStore',{
         resourceList: types.array(File),
+        resourceCount: types.number,
     }).views(self =>({
         get store() {
             return getParent(self);
         }
     })).actions(self => {
+        function setResourceCount(resCount) {
+            self.resourceCount = parseInt(resCount,10);
+        }
+
         function pushResourceList(file) {
             self.resourceList.push({
                 createTime: file.createTime,
-                documentSaveName: file.documentSaveName,
                 ext: file.ext,
                 fileSize: file.fileSize,
                 id: file.id,
@@ -65,17 +70,21 @@ export const FileStore = types
             }
         })
 
-        const getResourcesList = flow(function* () {
+        const getResourcesList = flow(function* (pageNumber) {
             try{
+                let param = {
+                    current: pageNumber,
+                };
                 self.resourceList = [];
-                const response = yield fetch('http://192.168.2.2:9000/documents/page',{
+                const response = yield fetch(`http://192.168.2.2:9000/documents/page?${stringify(param)}`,{
                     method:'GET',
                     headers:{
                         'Accept': 'application/json',
                         'Content-Type': 'application/json; charset=utf-8',
-                        'Authorization':localStorage.getItem('token'),
+                        'Authorization': localStorage.getItem('token'),
                     }
                 }).then(response =>  response.json());
+                setResourceCount(response.data.total);
                 return updateResourceList(response.data.records);
             }catch (error) {
                 console.log("Failed to get resourcelist",error);

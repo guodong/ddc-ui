@@ -4,8 +4,8 @@ import { logInStore } from './logInStore';
 import { corpusStore } from './corpusStore';
 export const Store = types.model('Store',{
     logInStore: types.optional(logInStore,{}),
-    FileStore: types.optional(FileStore,{resourceList:[]}),
-    corpusStore: types.optional(corpusStore,{}),
+    FileStore: types.optional(FileStore,{resourceList:[],resourceCount: 0}),
+    corpusStore: types.optional(corpusStore,{checkListCount: 0}),
 }).views(self => ({
 
 })).actions(self => {

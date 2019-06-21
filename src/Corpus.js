@@ -3,77 +3,11 @@ import {Button, Card, Divider, Icon, Modal, Table, Upload, message, Switch, Inpu
 import {Breadcrumb, Spin} from "antd";
 import {Link} from "react-router-dom";
 import {inject, observer} from "mobx-react";
+import './common/config';
 import moment from 'moment';
 import 'moment/min/locales';
 
 moment.locale('zh-cn');
-
-// const data = [
-//   {
-//     key: '1',
-//     name: 'XX项目申请书.doc',
-//     age: new Date().toDateString(),
-//     address: 'New York No. 1 Lake Park',
-//     tags: ['nice', 'developer'],
-//   },
-//   {
-//     key: '2',
-//     name: 'XX项目申请书.pdf',
-//     age: 42,
-//     address: 'London No. 1 Lake Park',
-//     tags: ['loser'],
-//   },
-//   {
-//     key: '3',
-//     name: 'XX项目申请书.docx',
-//     age: 32,
-//     address: 'Sidney No. 1 Lake Park',
-//     tags: ['cool', 'teacher'],
-//   },
-//   {
-//     key: '14',
-//     name: 'XX项目申请书.doc',
-//     age: new Date().toDateString(),
-//     address: 'New York No. 1 Lake Park',
-//     tags: ['nice', 'developer'],
-//   },
-//   {
-//     key: '25',
-//     name: 'XX项目申请书.pdf',
-//     age: 42,
-//     address: 'London No. 1 Lake Park',
-//     tags: ['loser'],
-//   },
-//   {
-//     key: '36',
-//     name: 'XX项目申请书.docx',
-//     age: 32,
-//     address: 'Sidney No. 1 Lake Park',
-//     tags: ['cool', 'teacher'],
-//   },
-//   {
-//     key: '17',
-//     name: 'XX项目申请书.doc',
-//     age: new Date().toDateString(),
-//     address: 'New York No. 1 Lake Park',
-//     tags: ['nice', 'developer'],
-//   },
-//   {
-//     key: '28',
-//     name: 'XX项目申请书.pdf',
-//     age: 42,
-//     address: 'London No. 1 Lake Park',
-//     tags: ['loser'],
-//   },
-//   {
-//     key: '39',
-//     name: 'XX项目申请书.docx',
-//     age: 32,
-//     address: 'Sidney No. 1 Lake Park',
-//     tags: ['cool', 'teacher'],
-//   },
-// ];
-
 
 
 class Corpus extends React.Component {
@@ -84,15 +18,22 @@ class Corpus extends React.Component {
             visible: false,
             data: [],
             isLoading: false,
+            paginationNumber: 1,
+            paginationSize: 10,
         };
     }
 
 
     componentWillMount(){
-        this.props.store.FileStore.getResourcesList().then(res => {
+        let { paginationNumber } = this.state;
+        this.refreshResourceList(paginationNumber);
+    }
+
+    refreshResourceList(pageNumber){
+        this.props.store.FileStore.getResourcesList(pageNumber).then(res => {
             this.setColumnData(this.props.store.FileStore.resourceList);
         });
-  }
+    }
 
     setColumnData(resultArr){
         const arr = [];
@@ -116,14 +57,38 @@ class Corpus extends React.Component {
 
 
   handleDelete = (record) => {
-      this.props.store.FileStore.deleteResource(record.id).then(response =>{
-            if (response.status === 200){
-                this.props.store.FileStore.getResourcesList().then(res => {
-                    this.setColumnData(this.props.store.FileStore.resourceList);
-                });
-            }
+      const { paginationNumber, paginationSize} = this.state;
+      let documentTotalCount = this.getTotalCount();
+      let lastPage = Math.ceil(documentTotalCount/paginationSize);
+      if(lastPage === paginationNumber){
+          let Item = documentTotalCount % paginationSize;
+          if(Item === 1 && lastPage !== 1){
+              this.props.store.FileStore.deleteResource(record.id).then(response =>{
+                      if (response.status === 200){
+                          let page = paginationNumber - 1;
+                          this.setState({
+                              paginationNumber: page,
+                          });
+                          this.refreshResourceList(page);
+                      }
+                  }
+              )
+          }else{
+              this.props.store.FileStore.deleteResource(record.id).then(response =>{
+                      if (response.status === 200){
+                          this.refreshResourceList(paginationNumber);
+                      }
+                  }
+              )
           }
-      )
+      }else{
+          this.props.store.FileStore.deleteResource(record.id).then(response =>{
+                  if (response.status === 200){
+                      this.refreshResourceList(paginationNumber);
+                  }
+              }
+          )
+      }
   }
 
   handleDownload = (obj) => {
@@ -145,9 +110,9 @@ class Corpus extends React.Component {
         this.state.isLoading = true;
         if(checked){
             this.props.store.FileStore.addCorpus(record.id).then(response =>{
-                if(response.status === 200){
-                    console.log(" add success");
-                }
+
+                console.log(" ");
+
             })
         }else {
             this.props.store.FileStore.removeCorpus(record.id).then(response =>{
@@ -157,7 +122,19 @@ class Corpus extends React.Component {
                 }
             })
         }
-}
+    }
+
+    getTotalCount() {
+        return this.props.store.FileStore.resourceCount;
+    }
+
+
+    onChange(pageNumber){
+        this.setState({
+            paginationNumber: pageNumber
+        });
+        this.refreshResourceList(pageNumber);
+    }
 
 
 
@@ -166,8 +143,6 @@ class Corpus extends React.Component {
       const columns = [
           {
               title: 'id',
-              dataIndex: 'name',
-              key: 'name',
               render: (text, record, idx) => idx,
           },
           {
@@ -184,13 +159,11 @@ class Corpus extends React.Component {
           },
           {
               title: '查重次数',
-              dataIndex: 'age',
-              key: 'age',
               render: t => 2
           },
           {
               title: '加入语料库',
-              key: 'action',
+              key: 'action1',
               render: (text,record) =>(<span>
                   {isLoading  ? (<Spin size='small'/> ) :(<Switch defaultChecked={false} onChange={(checked) => this.isAddCategory(checked,record)} />)}
               </span>),
@@ -207,6 +180,13 @@ class Corpus extends React.Component {
               ),
           },
       ];
+
+      const paginationConfig = {
+          showQuickJumper: true,
+          onChange: (page,pageSize) => {this.onChange(page,pageSize)},
+          defaultCurrent: 1,
+          total : this.getTotalCount(),
+      };
 
     const { selectedRowKeys } = this.state;
     const rowSelection = {
@@ -244,25 +224,13 @@ class Corpus extends React.Component {
     const props = {
         customRequest: ({file}) => {
             this.props.store.FileStore.upLoadFile(file).then(res => {
+                const { paginationNumber } = this.state;
                 if(res.status === 200){
                     message.success("上传成功");
-                    this.props.store.FileStore.getResourcesList().then(res => {
-                        this.setColumnData(this.props.store.FileStore.resourceList);
-                    });
+                    this.refreshResourceList(paginationNumber);
                 }
             })
         }
-      // onChange(info) {
-      //   if (info.file.status !== 'uploading') {
-      //     console.log("4567890",info.file);
-      //     console.log(info.file, info.fileList);
-      //   }
-      //   if (info.file.status === 'done') {
-      //     message.success(`${info.file.name} file uploaded successfully`);
-      //   } else if (info.file.status === 'error') {
-      //     message.error(`${info.file.name} file upload failed.`);
-      //   }
-      // },
     };
 
     return (
@@ -292,9 +260,7 @@ class Corpus extends React.Component {
               <Button style={{float: 'right'}}><Icon type="reload" /> 刷新</Button>
             </Col>
           </Row>
-
-
-          <Table rowSelection={rowSelection} columns={columns} dataSource={data} style={{marginTop: 20}}/>
+          <Table rowSelection={rowSelection} columns={columns} dataSource={data} pagination={paginationConfig} style={{marginTop: 20}}/>
         </Card>
       </div>
     )

@@ -47,7 +47,6 @@ export const logInStore = types.model('logInStore',{
             description: '赶快干活',
         });
       }else {
-        console.log("1111",response.data);
         localStorage.setItem('token',response.data);
         setIsLogin(true);
       }

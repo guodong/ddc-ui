@@ -16,7 +16,7 @@ export const check = types
 
 export const corpus = types
     .model('corpus',{
-        documentSaveName: types.string,
+        title: types.string,
         fileSize: types.string,
     })
 
@@ -24,7 +24,7 @@ export const corpusStore = types
     .model('corpusStore',{
         checkList: types.array(check),
         corpusDetail: types.map(corpus),
-
+        checkListCount: types.number,
     }).views(self => ({
 
     })).actions(self => {
@@ -37,8 +37,12 @@ export const corpusStore = types
             return self.checkList;
         }
 
+        function setCheckListCount(param) {
+            self.checkListCount = parseInt(param,10);
+        }
+
         function setCorpusDetail(corpus){
-            self.corpusDetail.documentSaveName = corpus.documentSaveName;
+            self.corpusDetail.title = corpus.title;
             self.corpusDetail.paragraph = corpus.paragraph;
             self.corpusDetail.fileSize = corpus.fileSize;
         }
@@ -75,13 +79,14 @@ export const corpusStore = types
             }
         })
 
-        const getCheckList = flow(function* (id) {
+        const getCheckList = flow(function* (payload) {
             try{
-                let query = {
-                    condition:{document_id: id}
-                };
+                // let query = {
+                //     condition:{document_id: id},
+                //     current: pageNumber,
+                // };
                 self.checkList = [];
-                const response = yield fetch(`http://192.168.2.2:9000/jobs/page?${stringify(query)}`,{
+                const response = yield fetch(`http://192.168.2.2:9000/jobs/page?${stringify(payload)}`,{
                     method:'GET',
                     headers:{
                         'Accept': 'application/json',
@@ -89,43 +94,65 @@ export const corpusStore = types
                         'Authorization':localStorage.getItem('token'),
                     }
                 }).then(response =>  response.json());
-                return updateCheckList(response.data.records);
+                if (response.status === 200){
+                    setCheckListCount(response.data.total);
+                    return updateCheckList(response.data.records);
+                }
             }catch (error) {
                 console.log("Failed to get resourcelist",error);
             }
         })
 
-        const downLoadFile = flow(function* (payload) {
+        const downLoadCheck = flow(function* (payload) {
             try{
-                const response = fetch(`http://192.168.2.2:9000/documents/${payload.id}/download`,{
+                const response = fetch(`http://192.168.2.2:9000/jobs/${payload.id}/download`,{
                     headers:{
                         'Authorization':localStorage.getItem('token'),
                     },
-                });
+                }).then(res => res.json());
+                console.log('666666666666666666',response);
                 return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
             }
         })
 
-        const removeCheck = flow(function* (payload) {
+        const removeCheck = flow(function* (id) {
             try{
-                const response = fetch(`http://192.168.2.2:9000/documents/${payload}/corpus`,{
+                const response = fetch(`http://192.168.2.2:9000/jobs/${id}`,{
                     headers:{
                         'Authorization':localStorage.getItem('token'),
                     },
                     method:'DELETE'
-                });
-                return response.json();
+                }).then(res => res.json());
+                return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
             }
         })
 
+        const createCheck = flow(function* (payload) {
+            try {
+                const response = fetch('http://192.168.2.2:9000/jobs',{
+                    headers:{
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Authorization':localStorage.getItem('token'),
+                    },
+                    method:'POST',
+                    body: JSON.stringify(payload)
+                }).then(res => res.json());
+                return response;
+            }catch (error) {
+                console.log("failed to create check",error);
+            }
+        })
+
+
         return{
             getCorpusById,
             getCheckList,
-            downLoadFile,
+            downLoadCheck,
             removeCheck,
+            createCheck,
         }
     })
