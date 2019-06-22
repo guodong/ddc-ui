@@ -149,7 +149,6 @@ export const FileStore = types
                     },
                     method:'POST'
                 }).then(res => res.json());
-                console.log("99999999999",response);
                 return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
