@@ -21,6 +21,7 @@ class Corpus extends React.Component {
             paginationNumber: 1,
             paginationSize: 10,
         };
+        this.isAddCategory = this.isAddCategory.bind(this);
     }
 
 
@@ -35,6 +36,8 @@ class Corpus extends React.Component {
         });
     }
 
+
+
     setColumnData(resultArr){
         const arr = [];
         resultArr.map((res) => {
@@ -42,11 +45,35 @@ class Corpus extends React.Component {
             result.name = res.title;
             result.age = res.createTime;
             result.id = res.id;
+            result.isCorpus = res.isCorpus;
+            result.isLoading = res.isLoading;
             arr.push(result);
         })
         this.setState({
             data: arr,
         })
+    }
+
+    findItemById(id){
+        const { data } = this.state;
+        let index = -1;
+        let len = data.length;
+        for (let i = 0; i < len; i++){
+            index += 1;
+            if(data[i].id === id){
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    setIsLoadingStatus(index,param){
+        const arr = this.props.store.FileStore.resourceList;
+
+        arr[index].isLoading = param;
+        this.setState({
+            data : arr,
+        });
     }
 
 
@@ -84,7 +111,9 @@ class Corpus extends React.Component {
       }else{
           this.props.store.FileStore.deleteResource(record.id).then(response =>{
                   if (response.status === 200){
-                      this.refreshResourceList(paginationNumber);
+                      this.props.store.FileStore.getResourcesList(paginationNumber).then(res => {
+                          this.setIsLoadingStatus()
+                      })
                   }
               }
           )
@@ -106,19 +135,36 @@ class Corpus extends React.Component {
       })
   }
 
+  setLoadingStatus(param){
+      this.props.store.FileStore.getResourcesList(param.paginationNumber).then(res => {
+          let index = this.props.store.FileStore.findItemById(param.id);
+          if(index !== -1){
+              this.props.store.FileStore.setIsLoadingStatus(index,param.loading);
+              this.setColumnData(this.props.store.FileStore.resourceList);
+          }
+      });
+  }
+
     isAddCategory = (checked,record) => {
-        this.state.isLoading = true;
+        const { paginationNumber } = this.state;
+        let payload = {
+            paginationNumber : paginationNumber,
+            id: record.id,
+            loading: true,
+        };
+        this.setLoadingStatus(payload);
         if(checked){
             this.props.store.FileStore.addCorpus(record.id).then(response =>{
-
-                console.log(" ");
-
+                if(response.status === 200){
+                    payload.loading = false;
+                    this.setLoadingStatus(payload);
+                }
             })
         }else {
             this.props.store.FileStore.removeCorpus(record.id).then(response =>{
                 if(response.status === 200){
-                    this.state.isLoading = false;
-                    console.log(" remove success");
+                    payload.loading = false;
+                    this.setLoadingStatus(payload);
                 }
             })
         }
@@ -134,6 +180,14 @@ class Corpus extends React.Component {
             paginationNumber: pageNumber
         });
         this.refreshResourceList(pageNumber);
+    }
+
+    isChecked(isCorpus){
+        if(isCorpus === 0){
+            return false;
+        }else {
+            return true;
+        }
     }
 
 
@@ -165,7 +219,7 @@ class Corpus extends React.Component {
               title: '加入语料库',
               key: 'action1',
               render: (text,record) =>(<span>
-                  {isLoading  ? (<Spin size='small'/> ) :(<Switch defaultChecked={false} onChange={(checked) => this.isAddCategory(checked,record)} />)}
+                  {record.isLoading  ? (<Spin size='small'/> ) :(<Switch defaultChecked={record.isCorpus} onChange={(checked) => this.isAddCategory(checked,record)} />)}
               </span>),
           },
           {

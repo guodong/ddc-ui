@@ -31,9 +31,11 @@ export default function request (url ,options) {
         }
     }
     if (!isNull(localStorage.getItem('token'))) {
+        console.log("5555555555555");
         // newOptions.headers = newOptions.headers || {};
         // newOptions.headers.Authorization = getLocalData('token');
         newOptions.headers.Authorization = localStorage.getItem('token');
+
     }
     console.log("00000",newOptions);
     return(

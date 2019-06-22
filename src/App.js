@@ -25,7 +25,7 @@ class App extends React.Component {
   onClick({key}) {
     if (key == 'logout') {
       this.props.store.setIsLogin(false);
-      this.props.history.push('/')
+      this.props.history.push('/login')
     }
   };
 

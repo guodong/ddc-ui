@@ -16,6 +16,7 @@ export const File = types
         type: types.string,
         updateTime: types.string,
         userId: types.string,
+        isLoading: false,
     })
 
 export const FileStore = types
@@ -44,8 +45,26 @@ export const FileStore = types
                 type: file.type,
                 updateTime: file.updateTime,
                 userId: file.userId,
+                // isLoading: false,
             });
         }
+
+       function findItemById(id){
+            let index = -1;
+            let len = self.resourceList.length;
+            for (let i = 0; i < len; i++){
+                index += 1;
+                if(self.resourceList[i].id === id){
+                    return index;
+                }
+            }
+            return -1;
+        }
+
+        function setIsLoadingStatus(index,param){
+            self.resourceList[index].isLoading = param;
+        }
+
 
         function updateResourceList(arr){
             if(arr.length !== 0){
@@ -129,8 +148,9 @@ export const FileStore = types
                         'Authorization':localStorage.getItem('token'),
                     },
                     method:'POST'
-                });
-                return response.json();
+                }).then(res => res.json());
+                console.log("99999999999",response);
+                return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
             }
@@ -143,8 +163,8 @@ export const FileStore = types
                         'Authorization':localStorage.getItem('token'),
                     },
                     method:'DELETE'
-                });
-                return response.json();
+                }).then(res => res.json());
+                return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
             }
@@ -158,6 +178,8 @@ export const FileStore = types
             downLoadFile,
             deleteResource,
             addCorpus,
-            removeCorpus
+            removeCorpus,
+            setIsLoadingStatus,
+            findItemById,
         }
     })

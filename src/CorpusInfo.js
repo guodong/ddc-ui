@@ -61,7 +61,7 @@ class CorpusInfo extends React.Component {
             result.documentId = res.documentId;
             result.id = res.id;
             result.createTime = res.createTime;
-            result.isFinished = res.isFinished;
+            result.isLoading = res.isLoading;
             arr.push(result);
         });
         this.setState({
