@@ -2,9 +2,7 @@ import { getLocalData } from './localData';
 import {isNull} from "./utils";
 
 export default function request (url ,options) {
-    const defaultOptions = {
-        credentials: 'include',
-    };
+    const defaultOptions = {};
     const newOptions = { ...options ,...defaultOptions};
     if (
         newOptions.method === 'POST' ||
@@ -16,9 +14,9 @@ export default function request (url ,options) {
             newOptions.headers = {
                 Accept: 'application/json',
                 'Content-Type': 'application/json; charset=utf-8',
-                'Access-Control-Allow-Origin':'*',
-                'Access-Control-Allow-Methods':'POST,GET,OPTIONS,DELETE',
-                'Access-Control-Allow-Headers': 'authorization,content-type',
+                // 'Access-Control-Allow-Origin':'*',
+                // 'Access-Control-Allow-Methods':'POST,GET,OPTIONS,DELETE',
+                // 'Access-Control-Allow-Headers': 'authorization,content-type',
                 ...newOptions.headers,
             };
             newOptions.body = JSON.stringify(newOptions.body);
@@ -36,11 +34,13 @@ export default function request (url ,options) {
         newOptions.headers.Authorization = localStorage.getItem('token');
 
     }
-    console.log("00000",newOptions);
     return(
-        fetch(url,newOptions)
-        .then(response => {
-            return response.json();
+        fetch(url,newOptions).then(res => {
+            return res.json();
         })
+        // fetch(url,newOptions)
+        // .then(response => {
+        //     return response.json();
+        // })
     )
 }

@@ -18,6 +18,7 @@ export const corpus = types
     .model('corpus',{
         title: types.string,
         fileSize: types.string,
+        paragraph: types.number,
     })
 
 export const corpusStore = types
@@ -43,7 +44,7 @@ export const corpusStore = types
 
         function setCorpusDetail(corpus){
             self.corpusDetail.title = corpus.title;
-            self.corpusDetail.paragraph = corpus.paragraph;
+            self.corpusDetail.paragraph = corpus.totalParagraph;
             self.corpusDetail.fileSize = corpus.fileSize;
         }
 

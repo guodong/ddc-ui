@@ -47,6 +47,7 @@ class Corpus extends React.Component {
             result.id = res.id;
             result.isCorpus = res.isCorpus;
             result.isLoading = res.isLoading;
+            result.checkTimes = res.checkTimes;
             arr.push(result);
         })
         this.setState({
@@ -54,18 +55,7 @@ class Corpus extends React.Component {
         })
     }
 
-    findItemById(id){
-        const { data } = this.state;
-        let index = -1;
-        let len = data.length;
-        for (let i = 0; i < len; i++){
-            index += 1;
-            if(data[i].id === id){
-                return index;
-            }
-        }
-        return -1;
-    }
+
 
     setIsLoadingStatus(index,param){
         const arr = this.props.store.FileStore.resourceList;
@@ -182,18 +172,9 @@ class Corpus extends React.Component {
         this.refreshResourceList(pageNumber);
     }
 
-    isChecked(isCorpus){
-        if(isCorpus === 0){
-            return false;
-        }else {
-            return true;
-        }
-    }
-
-
 
   render() {
-      const  { data,isLoading} = this.state;
+      const  { data } = this.state;
       const columns = [
           {
               title: 'id',
@@ -209,11 +190,12 @@ class Corpus extends React.Component {
               title: '导入时间',
               dataIndex: 'age',
               key: 'age',
-              render: t => moment().format('YYYY MMMM Do, a h:mm:ss')
+              render: t => moment(t).format('YYYY MMMM Do, a h:mm:ss')
           },
           {
               title: '查重次数',
-              render: t => 2
+              dataIndex: 'checkTimes',
+              key: 'checkTimes',
           },
           {
               title: '加入语料库',

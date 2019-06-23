@@ -16,7 +16,7 @@ export const File = types
         type: types.string,
         updateTime: types.string,
         userId: types.string,
-        isLoading: false,
+        checkTimes: types.number,
     })
 
 export const FileStore = types
@@ -45,7 +45,7 @@ export const FileStore = types
                 type: file.type,
                 updateTime: file.updateTime,
                 userId: file.userId,
-                // isLoading: false,
+                checkTimes: file.checkTimes,
             });
         }
 
@@ -95,14 +95,16 @@ export const FileStore = types
                     current: pageNumber,
                 };
                 self.resourceList = [];
-                const response = yield fetch(`http://192.168.2.2:9000/documents/page?${stringify(param)}`,{
-                    method:'GET',
-                    headers:{
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json; charset=utf-8',
-                        'Authorization': localStorage.getItem('token'),
-                    }
-                }).then(response =>  response.json());
+                const response = yield request(`http://192.168.2.2:9000/documents/page?${stringify(param)}`,{
+                    method: 'GET'});
+                // const response = yield fetch(`http://192.168.2.2:9000/documents/page?${stringify(param)}`,{
+                //     method:'GET',
+                //     headers:{
+                //         'Accept': 'application/json',
+                //         'Content-Type': 'application/json; charset=utf-8',
+                //         'Authorization': localStorage.getItem('token'),
+                //     }
+                // }).then(response =>  response.json());
                 setResourceCount(response.data.total);
                 return updateResourceList(response.data.records);
             }catch (error) {
@@ -112,11 +114,12 @@ export const FileStore = types
 
         const downLoadFile = flow(function* (payload) {
             try{
-                const response = fetch(`http://192.168.2.2:9000/documents/${payload.id}/download`,{
-                    headers:{
-                        'Authorization':localStorage.getItem('token'),
-                    },
-                });
+                const response = yield request(`http://192.168.2.2:9000/documents/${payload.id}/download`);
+                // const response = fetch(`http://192.168.2.2:9000/documents/${payload.id}/download`,{
+                //     headers:{
+                //         'Authorization':localStorage.getItem('token'),
+                //     },
+                // });
                 return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
@@ -127,14 +130,18 @@ export const FileStore = types
             const formdata = new FormData();
             formdata.append('file',file);
             try{
-                const response = yield fetch('http://192.168.2.2:9000/documents/upload',{
-                    headers:{
-                        // 'Content-Type': 'multipart/form-data',
-                        'Authorization':localStorage.getItem('token'),
-                    },
+                const response = yield request('http://192.168.2.2:9000/documents/upload',{
                     method: 'POST',
                     body: formdata,
-                }).then(response => {return response.json()});
+                });
+                // const response = yield fetch('http://192.168.2.2:9000/documents/upload',{
+                //     headers:{
+                //         // 'Content-Type': 'multipart/form-data',
+                //         'Authorization':localStorage.getItem('token'),
+                //     },
+                //     method: 'POST',
+                //     body: formdata,
+                // }).then(response => {return response.json()});
                 return response;
             }catch (error) {
                console.log("failed to upload file",error) ;

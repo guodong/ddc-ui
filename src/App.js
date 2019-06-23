@@ -42,6 +42,7 @@ class App extends React.Component {
 
     return (
       <Router>
+        {/*<Route path={`/`} exact component={Login}/>*/}
         <Layout style={{minHeight: '100vh'}} className="layout">
           <MyHeader/>
           <Route path={`/login`} component={Login}/>

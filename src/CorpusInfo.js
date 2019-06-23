@@ -248,7 +248,7 @@ class CorpusInfo extends React.Component {
         title: '创建时间',
         dataIndex: 'createTime',
         key: 'createTime',
-        render: t => moment().format('YYYY MMMM Do, a h:mm:ss')
+        render: t => moment(t).format('YYYY MMMM Do, a h:mm:ss')
       },
       {
         title: '运行状态',
