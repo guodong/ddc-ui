@@ -35,9 +35,7 @@ export default function request (url ,options) {
 
     }
     return(
-        fetch(url,newOptions).then(res => {
-            return res.json();
-        })
+        fetch(url,newOptions)
         // fetch(url,newOptions)
         // .then(response => {
         //     return response.json();

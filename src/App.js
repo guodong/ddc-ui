@@ -3,7 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import {Layout, Menu, Breadcrumb, Icon, Dropdown} from 'antd';
 import Corpus from "./Corpus";
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import {BrowserRouter as Router, Route, Redirect,Link} from "react-router-dom";
+import { IndexRoute } from 'react-router';
 import Check from "./Check";
 import Create from "./check/Create";
 import CorpusCreate from './corpus/Create';
@@ -45,12 +46,11 @@ class App extends React.Component {
         {/*<Route path={`/`} exact component={Login}/>*/}
         <Layout style={{minHeight: '100vh'}} className="layout">
           <MyHeader/>
-          <Route path={`/login`} component={Login}/>
+          {/*<Route path={`/`} component={Login}/>*/}
           <Content style={{padding: '0 50px 50px'}}>
-            {/*<Route path={`/check`} exact component={Check}/>*/}
-            {/*<Route path={`/check/create`} component={Create}/>*/}
-            <Route path={`/`} exact component={Corpus}/>
-            <Route path={`/corpus/:id`} exact component={CorpusInfo}/>
+              <Route path={`/corpus`} exact component={Corpus}/>
+              <Route path={`/corpus/:id`} exact component={CorpusInfo}/>
+              <Route exact path={`/`}  component={Login}/>
           </Content>
           <Footer style={{textAlign: 'center'}}>文档查重系统 v1.0.0 ©2019</Footer>
         </Layout>

@@ -62,6 +62,8 @@ class CorpusInfo extends React.Component {
             result.id = res.id;
             result.createTime = res.createTime;
             result.isLoading = res.isLoading;
+            result.isFinished = res.isFinished;
+            result.documentTitle = res.documentTitle;
             arr.push(result);
         });
         this.setState({
@@ -108,7 +110,7 @@ class CorpusInfo extends React.Component {
             response.blob().then((blob) =>{
                 let a = document.createElement('a');
                 let bolbUrl = window.URL.createObjectURL(blob);
-                let fileName = obj.title;
+                let fileName = obj.documentTitle;
                 a.href = bolbUrl;
                 a.download = fileName;
                 a.click();
@@ -140,14 +142,14 @@ class CorpusInfo extends React.Component {
                                 condition: {document_id: id},
                                 current: page,
                             };
-                            this.refreshResourceList(payload);
+                            this.updateCheckList(payload);
                         }
                     }
                 )
             }else{
                 this.props.store.corpusStore.removeCheck(record.id).then(response =>{
                         if (response.status === 200){
-                            this.refreshResourceList(param);
+                            this.updateCheckList(param);
                         }
                     }
                 )
@@ -155,7 +157,7 @@ class CorpusInfo extends React.Component {
         }else{
             this.props.store.corpusStore.removeCheck(record.id).then(response =>{
                     if (response.status === 200){
-                        this.refreshResourceList(param);
+                        this.updateCheckList(param);
                     }
                 }
             )
@@ -184,14 +186,14 @@ class CorpusInfo extends React.Component {
         documentId: this.props.match.params.id,
     };
     this.props.store.corpusStore.createCheck(param).then(res => {
-    });
-    let payload = {
-        condition:{document_id: this.props.match.params.id},
-        current: pageNumber,
-    };
-    this.updateCheckList(payload);
-    this.setState({
-        visible: false,
+        let payload = {
+            condition:{document_id: this.props.match.params.id},
+            current: pageNumber,
+        };
+        this.updateCheckList(payload);
+        this.setState({
+            visible: false,
+        });
     });
     }
 

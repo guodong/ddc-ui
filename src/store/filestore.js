@@ -77,13 +77,10 @@ export const FileStore = types
 
         const deleteResource = flow(function* (fileId) {
             try{
-                const response = yield fetch(`http://192.168.2.2:9000/documents/${fileId}`,{
-                    headers:{
-                        'Authorization':localStorage.getItem('token'),
-                    },
+                const response = yield request(`http://192.168.2.2:9000/documents/${fileId}`,{
                     method : 'DELETE',
-                });
-                return response.json();
+                }).then(res => res.json());
+                return response;
             }catch (error) {
                     console.log("Failed to delete resourcelist",error);
             }
@@ -96,15 +93,7 @@ export const FileStore = types
                 };
                 self.resourceList = [];
                 const response = yield request(`http://192.168.2.2:9000/documents/page?${stringify(param)}`,{
-                    method: 'GET'});
-                // const response = yield fetch(`http://192.168.2.2:9000/documents/page?${stringify(param)}`,{
-                //     method:'GET',
-                //     headers:{
-                //         'Accept': 'application/json',
-                //         'Content-Type': 'application/json; charset=utf-8',
-                //         'Authorization': localStorage.getItem('token'),
-                //     }
-                // }).then(response =>  response.json());
+                    method: 'GET'}).then(res => res.json());
                 setResourceCount(response.data.total);
                 return updateResourceList(response.data.records);
             }catch (error) {
@@ -114,12 +103,9 @@ export const FileStore = types
 
         const downLoadFile = flow(function* (payload) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/documents/${payload.id}/download`);
-                // const response = fetch(`http://192.168.2.2:9000/documents/${payload.id}/download`,{
-                //     headers:{
-                //         'Authorization':localStorage.getItem('token'),
-                //     },
-                // });
+                const response = yield request(`http://192.168.2.2:9000/documents/${payload.id}/download`,{
+                    method: 'GET'
+                });
                 return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
@@ -133,15 +119,7 @@ export const FileStore = types
                 const response = yield request('http://192.168.2.2:9000/documents/upload',{
                     method: 'POST',
                     body: formdata,
-                });
-                // const response = yield fetch('http://192.168.2.2:9000/documents/upload',{
-                //     headers:{
-                //         // 'Content-Type': 'multipart/form-data',
-                //         'Authorization':localStorage.getItem('token'),
-                //     },
-                //     method: 'POST',
-                //     body: formdata,
-                // }).then(response => {return response.json()});
+                }).then(res => res.json());
                 return response;
             }catch (error) {
                console.log("failed to upload file",error) ;
@@ -150,10 +128,7 @@ export const FileStore = types
 
         const addCorpus = flow(function* (payload) {
             try{
-                const response = fetch(`http://192.168.2.2:9000/documents/${payload}/corpus`,{
-                    headers:{
-                        'Authorization':localStorage.getItem('token'),
-                    },
+                const response = yield request(`http://192.168.2.2:9000/documents/${payload}/corpus`,{
                     method:'POST'
                 }).then(res => res.json());
                 return response;
@@ -164,10 +139,7 @@ export const FileStore = types
 
         const removeCorpus = flow(function* (payload) {
             try{
-                const response = fetch(`http://192.168.2.2:9000/documents/${payload}/corpus`,{
-                    headers:{
-                        'Authorization':localStorage.getItem('token'),
-                    },
+                const response = yield request(`http://192.168.2.2:9000/documents/${payload}/corpus`,{
                     method:'DELETE'
                 }).then(res => res.json());
                 return response;
@@ -179,8 +151,6 @@ export const FileStore = types
         return{
             getResourcesList,
             upLoadFile,
-            pushResourceList,
-            updateResourceList,
             downLoadFile,
             deleteResource,
             addCorpus,

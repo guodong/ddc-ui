@@ -1,5 +1,6 @@
 import {types, flow} from 'mobx-state-tree';
 import { stringify } from 'qs';
+import request from '../utils/request';
 
 export const check = types
     .model('check',{
@@ -11,7 +12,8 @@ export const check = types
         isFinished: types.number,
         repetitionRate: types.number,
         type: types.string,
-        updateTime: types.string
+        updateTime: types.string,
+        documentTitle: types.string
     })
 
 export const corpus = types
@@ -59,16 +61,14 @@ export const corpusStore = types
                 repetitionRate: param.repetitionRate,
                 type: param.type,
                 updateTime: param.updateTime,
+                documentTitle: param.document.title,
             });
 
         }
 
         const getCorpusById = flow(function* (id) {
             try{
-                const response = yield fetch(`http://192.168.2.2:9000/documents/${id}`,{
-                    headers:{
-                        'Authorization':localStorage.getItem('token'),
-                    },
+                const response = yield request(`http://192.168.2.2:9000/documents/${id}`,{
                     method: 'GET'
                 }).then(res => res.json());
                 if(response.status === 200){
@@ -87,14 +87,9 @@ export const corpusStore = types
                 //     current: pageNumber,
                 // };
                 self.checkList = [];
-                const response = yield fetch(`http://192.168.2.2:9000/jobs/page?${stringify(payload)}`,{
+                const response = yield request(`http://192.168.2.2:9000/jobs/page?${stringify(payload)}`,{
                     method:'GET',
-                    headers:{
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json; charset=utf-8',
-                        'Authorization':localStorage.getItem('token'),
-                    }
-                }).then(response =>  response.json());
+                }).then(res => res.json());
                 if (response.status === 200){
                     setCheckListCount(response.data.total);
                     return updateCheckList(response.data.records);
@@ -106,12 +101,9 @@ export const corpusStore = types
 
         const downLoadCheck = flow(function* (payload) {
             try{
-                const response = fetch(`http://192.168.2.2:9000/jobs/${payload.id}/download`,{
-                    headers:{
-                        'Authorization':localStorage.getItem('token'),
-                    },
-                }).then(res => res.json());
-                console.log('666666666666666666',response);
+                const response = yield request(`http://192.168.2.2:9000/jobs/${payload.id}/download`,{
+                    method: 'GET'
+                });
                 return response;
             }catch (error) {
                 console.log("failed to download file",error) ;
@@ -120,11 +112,8 @@ export const corpusStore = types
 
         const removeCheck = flow(function* (id) {
             try{
-                const response = fetch(`http://192.168.2.2:9000/jobs/${id}`,{
-                    headers:{
-                        'Authorization':localStorage.getItem('token'),
-                    },
-                    method:'DELETE'
+                const response = yield request(`http://192.168.2.2:9000/jobs/${id}`,{
+                    method:'DELETE',
                 }).then(res => res.json());
                 return response;
             }catch (error) {
@@ -134,13 +123,10 @@ export const corpusStore = types
 
         const createCheck = flow(function* (payload) {
             try {
-                const response = fetch('http://192.168.2.2:9000/jobs',{
-                    headers:{
-                        'Content-Type': 'application/json; charset=utf-8',
-                        'Authorization':localStorage.getItem('token'),
-                    },
+                const response = yield request('http://192.168.2.2:9000/jobs',{
                     method:'POST',
-                    body: JSON.stringify(payload)
+                    body: payload,
+                    // body: JSON.stringify(payload)
                 }).then(res => res.json());
                 return response;
             }catch (error) {

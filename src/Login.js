@@ -14,7 +14,7 @@ class NormalLoginForm extends React.Component {
         // this.props.store.setIsLogin(true);
           this.props.store.logInStore.goLogin(values.username,values.password);
           this.props.store.logInStore.setIsLogin(true);
-          this.props.history.push('/')
+          this.props.history.push('/corpus')
       }
     });
   };
