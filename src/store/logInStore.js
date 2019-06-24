@@ -1,6 +1,9 @@
 import {isNull} from "../utils/utils";
 import {types, flow, getRoot} from 'mobx-state-tree';
 import { notification } from 'antd';
+import  API from"../common/config";
+// import request from '../utils/request';
+
 import md5 from 'md5';
 import { setLocalData } from '../utils/localData';
 import request from '../utils/request';
@@ -29,23 +32,27 @@ export const logInStore = types.model('logInStore',{
       payload.account = userName;
       payload.password = passWord;
       // payload.password = md5(passWord);
-      const response = yield fetch('http://192.168.2.2:9000/auth',{
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
+      const response = yield request(API +`/auth`,{
           method: 'POST',
-          body: JSON.stringify(payload)
-      }).then(resp => resp.json());
-      if(isNull(response.data)){
-        notification.error({
-            message: '后端的锅，找老毕解决赶快解决，别再找前端了。。。。',
-            description: '赶快干活',
-        });
-      }else {
-        localStorage.setItem('token',response.data);
-        setIsLogin(true);
-      }
+          body: payload,
+      }).then(res => {
+          let response = res.json();
+          if(response.status === 200){
+              localStorage.removeItem('token');
+              localStorage.setItem('token',response.data);
+              setIsLogin(true);
+          }
+      });
+      // if(isNull(response.data)){
+      //   notification.error({
+      //       message: '后端出错',
+      //       description: '请联系后端',
+      //   });
+      // }else {
+      //   localStorage.removeItem('token');
+      //   localStorage.setItem('token',response.data);
+      //   setIsLogin(true);
+      // }
     })
 
 

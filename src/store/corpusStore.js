@@ -1,6 +1,8 @@
 import {types, flow} from 'mobx-state-tree';
 import { stringify } from 'qs';
 import request from '../utils/request';
+import  API from"../common/config";
+
 
 export const check = types
     .model('check',{
@@ -68,7 +70,7 @@ export const corpusStore = types
 
         const getCorpusById = flow(function* (id) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/documents/${id}`,{
+                const response = yield request(API + `/documents/${id}`,{
                     method: 'GET'
                 }).then(res => res.json());
                 if(response.status === 200){
@@ -87,7 +89,7 @@ export const corpusStore = types
                 //     current: pageNumber,
                 // };
                 self.checkList = [];
-                const response = yield request(`http://192.168.2.2:9000/jobs/page?${stringify(payload)}`,{
+                const response = yield request(API + `/jobs/page?${stringify(payload)}`,{
                     method:'GET',
                 }).then(res => res.json());
                 if (response.status === 200){
@@ -101,7 +103,7 @@ export const corpusStore = types
 
         const downLoadCheck = flow(function* (payload) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/jobs/${payload.id}/download`,{
+                const response = yield request(API + `/jobs/${payload.id}/download`,{
                     method: 'GET'
                 });
                 return response;
@@ -112,7 +114,7 @@ export const corpusStore = types
 
         const removeCheck = flow(function* (id) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/jobs/${id}`,{
+                const response = yield request(API + `/jobs/${id}`,{
                     method:'DELETE',
                 }).then(res => res.json());
                 return response;
@@ -123,7 +125,7 @@ export const corpusStore = types
 
         const createCheck = flow(function* (payload) {
             try {
-                const response = yield request('http://192.168.2.2:9000/jobs',{
+                const response = yield request(API + '/jobs',{
                     method:'POST',
                     body: payload,
                     // body: JSON.stringify(payload)

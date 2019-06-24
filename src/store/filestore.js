@@ -1,6 +1,8 @@
 import {types, flow, getRoot, getParent} from 'mobx-state-tree';
 import request from '../utils/request';
 import { stringify } from 'qs';
+import  API from"../common/config";
+
 
 
 export const File = types
@@ -77,7 +79,7 @@ export const FileStore = types
 
         const deleteResource = flow(function* (fileId) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/documents/${fileId}`,{
+                const response = yield request(API + `/documents/${fileId}`,{
                     method : 'DELETE',
                 }).then(res => res.json());
                 return response;
@@ -92,7 +94,7 @@ export const FileStore = types
                     current: pageNumber,
                 };
                 self.resourceList = [];
-                const response = yield request(`http://192.168.2.2:9000/documents/page?${stringify(param)}`,{
+                const response = yield request(API + `/documents/page?${stringify(param)}`,{
                     method: 'GET'}).then(res => res.json());
                 setResourceCount(response.data.total);
                 return updateResourceList(response.data.records);
@@ -103,7 +105,7 @@ export const FileStore = types
 
         const downLoadFile = flow(function* (payload) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/documents/${payload.id}/download`,{
+                const response = yield request(API + `/documents/${payload.id}/download`,{
                     method: 'GET'
                 });
                 return response;
@@ -116,7 +118,7 @@ export const FileStore = types
             const formdata = new FormData();
             formdata.append('file',file);
             try{
-                const response = yield request('http://192.168.2.2:9000/documents/upload',{
+                const response = yield request(API + '/documents/upload',{
                     method: 'POST',
                     body: formdata,
                 }).then(res => res.json());
@@ -128,7 +130,7 @@ export const FileStore = types
 
         const addCorpus = flow(function* (payload) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/documents/${payload}/corpus`,{
+                const response = yield request(API + `/documents/${payload}/corpus`,{
                     method:'POST'
                 }).then(res => res.json());
                 return response;
@@ -139,7 +141,7 @@ export const FileStore = types
 
         const removeCorpus = flow(function* (payload) {
             try{
-                const response = yield request(`http://192.168.2.2:9000/documents/${payload}/corpus`,{
+                const response = yield request(API + `/documents/${payload}/corpus`,{
                     method:'DELETE'
                 }).then(res => res.json());
                 return response;

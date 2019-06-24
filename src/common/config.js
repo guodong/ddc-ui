@@ -1,1 +1,3 @@
-global.paginationData = { pageCurr: 1, sizeOfPage: 10 };
+const API = "http://api.ddc.kfcoding.com";
+
+export default API;
