@@ -20,6 +20,7 @@ class Corpus extends React.Component {
             isLoading: false,
             paginationNumber: 1,
             paginationSize: 10,
+            isChecked: false
         };
         this.isAddCategory = this.isAddCategory.bind(this);
     }
@@ -148,6 +149,8 @@ class Corpus extends React.Component {
                 if(response.status === 200){
                     payload.loading = false;
                     this.setLoadingStatus(payload);
+                }else {
+                    message.error('加入语料库失败');
                 }
             })
         }else {
@@ -155,6 +158,8 @@ class Corpus extends React.Component {
                 if(response.status === 200){
                     payload.loading = false;
                     this.setLoadingStatus(payload);
+                }else {
+                    message.error('移出语料库失败');
                 }
             })
         }
@@ -174,7 +179,7 @@ class Corpus extends React.Component {
 
 
   render() {
-      const  { data } = this.state;
+      const  { data ,isChecked} = this.state;
       const columns = [
           {
               title: 'id',

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Card, Checkbox, Icon, Input} from "antd";
+import {Button, Card, Checkbox, Icon, Input,message,notification} from "antd";
 import {Form} from "antd";
 import {withRouter} from 'react-router-dom'
 import {inject, observer} from "mobx-react";
@@ -13,11 +13,16 @@ class NormalLoginForm extends React.Component {
         console.log('Received values of form: ', values);
         // this.props.store.setIsLogin(true);
           this.props.store.logInStore.goLogin(values.username,values.password).then(res => {
-              this.props.store.logInStore.setIsLogin(true);
-              this.props.history.push('/corpus');
+              if(res.status === 200){
+                  localStorage.setItem('token',res.data);
+                  this.props.store.logInStore.setIsLogin(true);
+                  this.props.history.push('/corpus');
+              }else{
+                  notification.error({
+                      message: '用户不存在或密码错误！',
+                  });
+              }
           });
-          // this.props.store.logInStore.setIsLogin(true);
-          // this.props.history.push('/corpus');
       }
     });
   };

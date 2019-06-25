@@ -36,23 +36,7 @@ export const logInStore = types.model('logInStore',{
           method: 'POST',
           body: payload,
       }).then(res => res.json());
-        // console.log('1111111',response.status);
-        if(response.status === 200){
-            // localStorage.removeItem('token');
-            localStorage.setItem('token',response.data);
-            setIsLogin(true);
-        }
-        return response;
-      // if(isNull(response.data)){
-      //   notification.error({
-      //       message: '后端出错',
-      //       description: '请联系后端',
-      //   });
-      // }else {
-      //   localStorage.removeItem('token');
-      //   localStorage.setItem('token',response.data);
-      //   setIsLogin(true);
-      // }
+      return response;
     })
 
 

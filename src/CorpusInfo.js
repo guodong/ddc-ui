@@ -87,10 +87,14 @@ class CorpusInfo extends React.Component {
         return (bytes/Math.pow(k,i)).toFixed(1)+ '' +sizes[i];
     }
 
-  showVisualizationModel = () => {
-    this.setState({
-        visualizationModel: true,
-    });
+  showVisualizationModel = (record) => {
+        if(record.isFinished){
+            this.setState({
+                visualizationModel: true,
+            });
+        }else{
+            return;
+        }
   };
 
   handleOk = () => {
@@ -106,62 +110,67 @@ class CorpusInfo extends React.Component {
     }
 
     handleDownload = (obj) => {
-        this.props.store.corpusStore.downLoadCheck(obj).then((response)=>{
-            response.blob().then((blob) =>{
-                let a = document.createElement('a');
-                let bolbUrl = window.URL.createObjectURL(blob);
-                let fileName = obj.documentTitle;
-                a.href = bolbUrl;
-                a.download = fileName;
-                a.click();
-                window.URL.revokeObjectURL(bolbUrl);
-                a = null;
-            })
-        })
+      if(obj.isFinished){
+          this.props.store.corpusStore.downLoadCheck(obj).then((response)=>{
+              response.blob().then((blob) =>{
+                  let a = document.createElement('a');
+                  let bolbUrl = window.URL.createObjectURL(blob);
+                  let fileName = obj.documentTitle;
+                  a.href = bolbUrl;
+                  a.download = fileName;
+                  a.click();
+                  window.URL.revokeObjectURL(bolbUrl);
+                  a = null;
+              })
+          })
+      }else{
+          return ;
+      }
     }
 
     handleDelete = (record) => {
-        const { pageNumber, paginationSize} = this.state;
-        let id = this.props.match.params.id;
-        let param = {
-            condition:{document_id: id},
-            current: pageNumber,
-        };
-        let documentTotalCount = this.getCheckListTotalCount();
-        let lastPage = Math.ceil(documentTotalCount/paginationSize);
-        if(lastPage === pageNumber){
-            let Item = documentTotalCount % paginationSize;
-            if(Item === 1 && lastPage !== 1){
-                this.props.store.corpusStore.removeCheck(record.id).then(response =>{
-                        if (response.status === 200){
-                            let page = pageNumber - 1;
-                            this.setState({
-                                pageNumber: page,
-                            });
-                            let payload = {
-                                condition: {document_id: id},
-                                current: page,
-                            };
-                            this.updateCheckList(payload);
-                        }
-                    }
-                )
-            }else{
-                this.props.store.corpusStore.removeCheck(record.id).then(response =>{
-                        if (response.status === 200){
-                            this.updateCheckList(param);
-                        }
-                    }
-                )
-            }
-        }else{
-            this.props.store.corpusStore.removeCheck(record.id).then(response =>{
-                    if (response.status === 200){
-                        this.updateCheckList(param);
-                    }
-                }
-            )
-        }
+          const { pageNumber, paginationSize} = this.state;
+          let id = this.props.match.params.id;
+          let param = {
+              condition:{document_id: id},
+              current: pageNumber,
+          };
+          let documentTotalCount = this.getCheckListTotalCount();
+          let lastPage = Math.ceil(documentTotalCount/paginationSize);
+          if(lastPage === pageNumber){
+              let Item = documentTotalCount % paginationSize;
+              if(Item === 1 && lastPage !== 1){
+                  this.props.store.corpusStore.removeCheck(record.id).then(response =>{
+                          if (response.status === 200){
+                              let page = pageNumber - 1;
+                              this.setState({
+                                  pageNumber: page,
+                              });
+                              let payload = {
+                                  condition: {document_id: id},
+                                  current: page,
+                              };
+                              this.updateCheckList(payload);
+                          }
+                      }
+                  )
+              }else{
+                  this.props.store.corpusStore.removeCheck(record.id).then(response =>{
+                          if (response.status === 200){
+                              this.updateCheckList(param);
+                          }
+                      }
+                  )
+              }
+          }else{
+              this.props.store.corpusStore.removeCheck(record.id).then(response =>{
+                      if (response.status === 200){
+                          this.updateCheckList(param);
+                      }
+                  }
+              )
+          }
+
     }
 
     getCheckListTotalCount(){
@@ -266,11 +275,11 @@ class CorpusInfo extends React.Component {
         key: 'action',
         render: (text, record) => (
             <span>
-        <a href="javascript:;" title={'下载'} onClick={() => this.handleDownload(record)} ><Icon type="download"/></a>
+        <a href="javascript:;" title={'下载'} onClick={() => this.handleDownload(record)} ><Icon type="download" style={record.isFinished ? {} : {color :'grey'}}/></a>
         <Divider type="vertical"/>
         <a href="javascript:;" title={'删除'} onClick={() => this.handleDelete(record)}><Icon type="delete" /></a>
         <Divider type="vertical"/>
-         <a href="javascript:;" title={'统计'} onClick={() => this.showVisualizationModel()}><Icon type="eye" /></a>
+         <a href="javascript:;" title={'统计'} onClick={() => this.showVisualizationModel(record)}><Icon type="eye" style={record.isFinished ? {} : {color :'grey'}}/></a>
             </span>
         ),
       },
@@ -281,6 +290,9 @@ class CorpusInfo extends React.Component {
         <Breadcrumb style={{margin: '16px 0'}}>
           <Breadcrumb.Item>语料库管理</Breadcrumb.Item>
           <Breadcrumb.Item>{documentDetail.documentTitle}</Breadcrumb.Item>
+          <Breadcrumb.Item>
+              <Link to='/corpus'>返回</Link>
+          </Breadcrumb.Item>
         </Breadcrumb>
         <Card title={'文档信息'}>
           <p>文档名称：
