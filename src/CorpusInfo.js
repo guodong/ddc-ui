@@ -320,9 +320,10 @@ class CorpusInfo extends React.Component {
           </Breadcrumb.Item>
         </Breadcrumb>
         <Card title={'文档信息'}>
-          <p>文档名称：
-            <a href="javascript:;" title={'下载报告'}>{documentDetail.documentTitle}<Icon type="download"/></a></p>
-          <p>段落数量：{documentDetail.paragraphAmount}</p>
+          {/*<p>文档名称：*/}
+            {/*<a href="javascript:;" title={'下载报告'}>{documentDetail.documentTitle}<Icon type="download"/></a></p>*/}
+            <p>文档名称：{documentDetail.documentTitle}</p>
+            <p>段落数量：{documentDetail.paragraphAmount}</p>
           <p>文档大小：{documentDetail.documentSize}</p>
         </Card>
         <Card title={'查重任务'} style={{marginTop: 30}}>
