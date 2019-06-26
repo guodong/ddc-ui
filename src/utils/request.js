@@ -41,7 +41,7 @@ const checkStatus = response => {
         if (data.status < 200 || data.status > 300) {
             notification.error({
                 message: data.message,
-                description: data.status,
+                // description: data.status,
             });
         }
     });
