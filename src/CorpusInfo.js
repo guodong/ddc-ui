@@ -56,11 +56,15 @@ class CorpusInfo extends React.Component {
             let rate = obj[key];
             repetitionRate.push(rate);
         }
-        let rateSum = repetitionRate.reduce((value1,value2) => {
-            return value1 + value2;
-        });
         let len = repetitionRate.length;
-        return Number((rateSum / len) * 100 ).toFixed(2);
+        if(len !== 0){
+            let rateSum = repetitionRate.reduce((value1,value2) => {
+                return value1 + value2;
+            });
+            return Number((rateSum / len) * 100 ).toFixed(2);
+        }else{
+            return 0;
+        }
     }
 
     updateCheckList(param){
@@ -108,7 +112,6 @@ class CorpusInfo extends React.Component {
         if(record.isFinished){
             this.props.store.corpusStore.getVisualizationData(record.id).then(res => {
                 let result = JSON.parse(res.data.result);
-                console.log("555555555555555",result);
                 let rate = this.getRate(result);
                 this.setState({
                     visualizationData: result,
