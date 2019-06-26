@@ -137,11 +137,23 @@ export const corpusStore = types
         })
 
 
+        const getVisualizationData = flow(function* (id) {
+            try{
+                const response = yield request(API + `/jobs/${id}`,{
+                    method:'GET',
+                }).then(res => res.json());
+                return response;
+            }catch (error) {
+                console.log("failed to get visualization data",error) ;
+            }
+        })
+
         return{
             getCorpusById,
             getCheckList,
             downLoadCheck,
             removeCheck,
             createCheck,
+            getVisualizationData,
         }
     })

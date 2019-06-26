@@ -12,14 +12,44 @@ import 'echarts/lib/chart/scatter';
 
 //引入图例组件
 import 'echarts/lib/component/legend';
+import { getRepetitionRate } from './utils/utils';
 
 class RepetitionArticleBar extends React.Component{
     constructor(props){
         super(props);
     }
 
-    initChart = () =>{
+    // getRepetitionRate(obj){
+    //     let repetitionRate = [];
+    //     for (var  key in obj){
+    //         let rate = obj[key];
+    //         let fixRate = Number(rate * 100).toFixed(2);
+    //         repetitionRate.push(fixRate);
+    //     }
+    //     return repetitionRate;
+    // }
+
+    getData(result){
+        let arr = [];
+        result.sort((value1,value2) =>{ return value2 -value1;});
+        for (let i = 0; i < result.length;){
+            var count = 0;
+            for(let j = i; j < result.length; j++){
+                if(result[i] === result[j]){
+                    count++;
+                }
+            }
+            let data = [result[i],count,`${result[i]}%`];
+            arr.push(data);
+            i += count;
+        }
+        return arr;
+    }
+
+    initChart = (result) =>{
         // 指定图表的配置项和数据
+        let arr = getRepetitionRate(result);
+        let data = this.getData(arr);
         let option = {
             xAxis: {
                 name: '百分比（%）'
@@ -32,19 +62,20 @@ class RepetitionArticleBar extends React.Component{
                 itemStyle:{
                     color: 'rgb(16,142,233)',
                 },
-                data: [
-                    [40.0, 2, '40%'],
-                    [2.0, 1,'2%'],
-                    [13.0, 1, '13%'],
-                    [9.0, 1,'9%'],
-                    [11.0, 1,'11%'],
-                    [14.0, 2,'14%'],
-                    [30.0, 2,'30%'],
-                    [20.0, 1, '20%'],
-                    [42.0, 1, '42%'],
-                    [10.0, 3, '10%'],
-                    [5.0, 2, '5%']
-                ],
+                // data: [
+                //     [40.0, 2, '40%'],
+                //     [2.0, 1,'2%'],
+                //     [13.0, 1, '13%'],
+                //     [9.0, 1,'9%'],
+                //     [11.0, 1,'11%'],
+                //     [14.0, 2,'14%'],
+                //     [30.0, 2,'30%'],
+                //     [20.0, 1, '20%'],
+                //     [42.0, 1, '42%'],
+                //     [10.0, 3, '10%'],
+                //     [5.0, 2, '5%']
+                // ],
+                data: data,
                 type: 'scatter',
                 label:{
                     emphasis:{
@@ -64,11 +95,13 @@ class RepetitionArticleBar extends React.Component{
     }
 
     componentDidMount(){
-        this.initChart();
+        let result = this.props.result;
+        this.initChart(result);
     }
 
     componentDidUpdate(){
-        this.initChart();
+        let result = this.props.result;
+        this.initChart(result);
     }
 
     render(){

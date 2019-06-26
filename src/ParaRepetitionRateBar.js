@@ -11,31 +11,27 @@ import 'echarts/lib/component/title';
 
 //引入图例组件
 import 'echarts/lib/component/legend';
+import {inject, observer} from "mobx-react";
+import { getRepetitionRate } from './utils/utils';
+
 
 class ParaRepetitionRateBar extends React.Component{
     constructor(props){
         super(props);
     }
 
-    initChart = () =>{
-        // let option = {
-        //     title: {
-        //         text : '段落重复率',
-        //     },
-        //     tooltip: {},
-        //     legend:{
-        //         data:['段落']
-        //     },
-        //     xAxis: {
-        //         data: []
-        //     },
-        //     yAxis: {},
-        //     series:[{
-        //         name: '段落',
-        //         type: 'bar',
-        //         data: []
-        //     }]
-        // };
+    getCategory(obj){
+        let category = [];
+        for(var key in obj){
+            let keyName = `第${key}段`;
+            category.push(keyName);
+        }
+        return category;
+    }
+
+
+    initChart = (data) =>{
+        console.log("666666666666",this.getCategory(data));
         // 指定图表的配置项和数据
         let option = {
             title: {
@@ -47,7 +43,8 @@ class ParaRepetitionRateBar extends React.Component{
             },
             xAxis: {
                 name: '段落',
-                data: ["第1段","第2段","第3段","第4段","第5段","第6段"]
+                // data: ["第1段","第2段","第3段","第4段","第5段","第6段"]
+                data: this.getCategory(data),
             },
             yAxis: {
                 name: '重复率(%)',
@@ -58,7 +55,8 @@ class ParaRepetitionRateBar extends React.Component{
                 },
                 name: '重复率',
                 type: 'bar',
-                data: [5, 20, 36, 10, 10, 20],
+                // data: [5, 20, 36, 10, 10, 20],
+                data: getRepetitionRate(data),
             }]
         };
 
@@ -67,11 +65,13 @@ class ParaRepetitionRateBar extends React.Component{
     }
 
     componentDidMount(){
-        this.initChart();
+        let result = this.props.result;
+        this.initChart(result);
     }
 
     componentDidUpdate(){
-        this.initChart();
+        let result = this.props.result;
+        this.initChart(result);
     }
 
     render(){
@@ -84,5 +84,6 @@ class ParaRepetitionRateBar extends React.Component{
 }
 
 export default ParaRepetitionRateBar;
+
 
 

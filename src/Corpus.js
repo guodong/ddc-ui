@@ -289,17 +289,17 @@ class Corpus extends React.Component {
                 </Button>
               </Upload>
             </Col>
-            <Col span={6} >
-              <Input.Search
-                placeholder="输入文档名称查询"
-                onSearch={value => console.log(value)}
-                style={{ width: 200 }}
-                allowClear
-              />
-            </Col>
-            <Col span={12} >
-              <Button style={{float: 'right'}}><Icon type="reload" /> 刷新</Button>
-            </Col>
+            {/*<Col span={6} >*/}
+              {/*<Input.Search*/}
+                {/*placeholder="输入文档名称查询"*/}
+                {/*onSearch={value => console.log(value)}*/}
+                {/*style={{ width: 200 }}*/}
+                {/*allowClear*/}
+              {/*/>*/}
+            {/*</Col>*/}
+            {/*<Col span={12} >*/}
+              {/*<Button style={{float: 'right'}}><Icon type="reload" /> 刷新</Button>*/}
+            {/*</Col>*/}
           </Row>
           <Table rowSelection={rowSelection} columns={columns} dataSource={data} pagination={paginationConfig} style={{marginTop: 20}}/>
         </Card>

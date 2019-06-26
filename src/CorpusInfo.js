@@ -8,6 +8,8 @@ import RepetitionArticleBar from './RepetitionArticleBar';
 import moment from "moment";
 import 'moment/min/locales';
 import {inject, observer} from "mobx-react";
+import { getRepetitionRate } from './utils/utils';
+
 
 
 moment.locale('zh-cn');
@@ -25,6 +27,8 @@ class CorpusInfo extends React.Component {
         pageNumber: 1,
         paginationSize: 10,
         dataValue: '0',
+        visualizationData : {} ,
+        totalRepetition: 0,
     };
 }
 
@@ -44,6 +48,19 @@ class CorpusInfo extends React.Component {
             });
         });
         this.updateCheckList(payload);
+    }
+
+    getRate(obj){
+        let repetitionRate = [];
+        for (let key in obj){
+            let rate = obj[key];
+            repetitionRate.push(rate);
+        }
+        let rateSum = repetitionRate.reduce((value1,value2) => {
+            return value1 + value2;
+        });
+        let len = repetitionRate.length;
+        return Number((rateSum / len) * 100 ).toFixed(2);
     }
 
     updateCheckList(param){
@@ -89,9 +106,17 @@ class CorpusInfo extends React.Component {
 
   showVisualizationModel = (record) => {
         if(record.isFinished){
-            this.setState({
-                visualizationModel: true,
+            this.props.store.corpusStore.getVisualizationData(record.id).then(res => {
+                let result = JSON.parse(res.data.result);
+                console.log("555555555555555",result);
+                let rate = this.getRate(result);
+                this.setState({
+                    visualizationData: result,
+                    visualizationModel: true,
+                    totalRepetition: rate,
+                });
             });
+
         }else{
             return;
         }
@@ -237,7 +262,7 @@ class CorpusInfo extends React.Component {
           total : this.getCheckListTotalCount(),
       };
 
-      const { documentDetail, data } = this.state;
+      const { documentDetail, data, visualizationData,totalRepetition } = this.state;
       const columns = [
       {
         title: 'id',
@@ -327,26 +352,27 @@ class CorpusInfo extends React.Component {
               visible={this.state.visualizationModel}
               onOk={this.handleOk}
               onCancel={this.handleCancel}
-              width='1200px'
+              // width='1200px'
+              width = '80%'
           >
               <Row gutter={16}>
-                  <Col span={12}>
+                  <Col span={11}>
                       <Row>
                           <Card title="重复率"  >
                               <div style={{textAlign:'center'}}>
-                                  <Progress type="circle" percent={75}/>
+                                  <Progress type="circle" percent={totalRepetition}/>
                               </div>
                           </Card>
                       </Row>
                       <Row style={{marginTop:'20px'}}>
                           <Card title="段落重复率"  >
-                              <ParaRepetitionRateBar />
+                              <ParaRepetitionRateBar result={visualizationData} />
                           </Card>
                       </Row>
                   </Col>
-                  <Col span={12}>
-                      <Card title="重复率散点图">
-                          <RepetitionArticleBar />
+                  <Col span={13}>
+                      <Card title="重复率散点图" style={{height: '100%'}}>
+                          <RepetitionArticleBar result={visualizationData} />
                       </Card>
                   </Col>
               </Row>
