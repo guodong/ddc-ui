@@ -24,7 +24,11 @@ class MyHeader extends React.Component {
     );
     return (
       <Header>
-        <span className='logo'>文档查重系统</span>
+          <img src="headlogo1.png" height="100%"></img>
+          <img src="headlogo2.png" height="100%"></img>
+        <span className='logo' style={{float: 'right'}}>
+            文档查重系统
+        </span>
         {this.props.store.isLogin &&
         <Dropdown overlay={menu} trigger={['click']}>
           <a className="ant-dropdown-link" href="#" style={{float: 'right'}}>
@@ -38,4 +42,4 @@ class MyHeader extends React.Component {
   }
 }
 
-export default inject('store')(observer(withRouter(MyHeader)));
+export default inject('store')(observer(MyHeader));
