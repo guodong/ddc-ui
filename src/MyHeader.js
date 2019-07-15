@@ -23,7 +23,7 @@ class MyHeader extends React.Component {
       </Menu>
     );
     return (
-      <Header>
+      <Header style={{background: "#04564A"}}>
           <img src="headlogo1.png" height="100%"></img>
           <img src="headlogo2.png" height="100%"></img>
         <span className='logo' style={{float: 'right'}}>
