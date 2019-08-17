@@ -31,7 +31,6 @@ class ParaRepetitionRateBar extends React.Component{
 
 
     initChart = (data) =>{
-        console.log("666666666666",this.getCategory(data));
         // 指定图表的配置项和数据
         let option = {
             title: {

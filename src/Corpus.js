@@ -177,8 +177,12 @@ class Corpus extends React.Component {
         this.refreshResourceList(pageNumber);
     }
 
+    handleChange = info => {
+        let fileList = [...info.fileList];
+    }
 
-  render() {
+
+    render() {
       const  { data ,isChecked} = this.state;
       const columns = [
           {
@@ -264,14 +268,15 @@ class Corpus extends React.Component {
 
     const props = {
         customRequest: ({file}) => {
-            this.props.store.FileStore.upLoadFile(file).then(res => {
+            this.props.store.FileStore.upLoadFile (file).then(res => {
                 const { paginationNumber } = this.state;
                 if(res.status === 200){
                     message.success("上传成功");
                     this.refreshResourceList(paginationNumber);
                 }
             })
-        }
+        },
+        onChange: this.handleChange,
     };
 
     return (
@@ -283,7 +288,7 @@ class Corpus extends React.Component {
         <Card title={'文档中心'}>
           <Row gutter={16}>
             <Col span={6} >
-              <Upload howUploadList={false} showUploadList={false} {...props} style={{display: 'inline-block'}}>
+              <Upload howUploadList={false} multiple={true} showUploadList={false} {...props} style={{display: 'inline-block'}}>
                 <Button type={'primary'}>
                   <Icon type="upload" /> 上传文档
                 </Button>

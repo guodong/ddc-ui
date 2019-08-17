@@ -69,6 +69,7 @@ export const FileStore = types
 
 
         function updateResourceList(arr){
+            self.resourceList = [];
             if(arr.length !== 0){
                 arr.forEach(res => {
                     pushResourceList(res);
