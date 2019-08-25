@@ -89,11 +89,11 @@ export const FileStore = types
             }
         })
 
-        const getResourcesList = flow(function* (pageNumber) {
+        const getResourcesList = flow(function* (param) {
             try{
-                let param = {
-                    current: pageNumber,
-                };
+                // let param = {
+                //     current: pageNumber,
+                // };
                 self.resourceList = [];
                 const response = yield request(API + `/documents/page?${stringify(param)}`,{
                     method: 'GET'}).then(res => res.json());

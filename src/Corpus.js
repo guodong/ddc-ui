@@ -28,11 +28,14 @@ class Corpus extends React.Component {
 
     componentWillMount(){
         let { paginationNumber } = this.state;
-        this.refreshResourceList(paginationNumber);
+        let payload = {
+            current: paginationNumber
+        };
+        this.refreshResourceList(payload);
     }
 
-    refreshResourceList(pageNumber){
-        this.props.store.FileStore.getResourcesList(pageNumber).then(res => {
+    refreshResourceList(payload){
+        this.props.store.FileStore.getResourcesList(payload).then(res => {
             this.setColumnData(this.props.store.FileStore.resourceList);
         });
     }
@@ -87,14 +90,20 @@ class Corpus extends React.Component {
                           this.setState({
                               paginationNumber: page,
                           });
-                          this.refreshResourceList(page);
+                          let payload ={
+                              current: page,
+                          };
+                          this.refreshResourceList(payload);
                       }
                   }
               )
           }else{
               this.props.store.FileStore.deleteResource(record.id).then(response =>{
                       if (response.status === 200){
-                          this.refreshResourceList(paginationNumber);
+                          let payload = {
+                              current: paginationNumber,
+                          };
+                          this.refreshResourceList(payload);
                       }
                   }
               )
@@ -174,11 +183,22 @@ class Corpus extends React.Component {
         this.setState({
             paginationNumber: pageNumber
         });
-        this.refreshResourceList(pageNumber);
+        let payload = {
+            current: pageNumber,
+        };
+        this.refreshResourceList(payload);
     }
 
     handleChange = info => {
         let fileList = [...info.fileList];
+    }
+
+    searchDocument = (value) =>{
+        let payload = {
+            current: 1,
+            condition: {title: value},
+        };
+        this.refreshResourceList(payload);
     }
 
 
@@ -272,7 +292,10 @@ class Corpus extends React.Component {
                 const { paginationNumber } = this.state;
                 if(res.status === 200){
                     message.success("上传成功");
-                    this.refreshResourceList(paginationNumber);
+                    let payload = {
+                        current: paginationNumber,
+                    };
+                    this.refreshResourceList(payload);
                 }
             })
         },
@@ -287,26 +310,26 @@ class Corpus extends React.Component {
         </Breadcrumb>
         <Card title={'文档中心'}>
           <Row gutter={16}>
-            <Col span={6} >
+            <Col span={18} >
               <Upload howUploadList={false} multiple={true} showUploadList={false} {...props} style={{display: 'inline-block'}}>
                 <Button type={'primary'}>
                   <Icon type="upload" /> 上传文档
                 </Button>
               </Upload>
             </Col>
-            {/*<Col span={6} >*/}
-              {/*<Input.Search*/}
-                {/*placeholder="输入文档名称查询"*/}
-                {/*onSearch={value => console.log(value)}*/}
-                {/*style={{ width: 200 }}*/}
-                {/*allowClear*/}
-              {/*/>*/}
-            {/*</Col>*/}
+            <Col span={6} >
+              <Input.Search
+                placeholder="输入文档名称查询"
+                onSearch={value => this.searchDocument(value)}
+                style={{ width: 200 }}
+                allowClear
+              />
+            </Col>
             {/*<Col span={12} >*/}
               {/*<Button style={{float: 'right'}}><Icon type="reload" /> 刷新</Button>*/}
             {/*</Col>*/}
           </Row>
-          <Table rowSelection={rowSelection} columns={columns} dataSource={data} pagination={paginationConfig} style={{marginTop: 20}}/>
+          <Table columns={columns} dataSource={data} pagination={paginationConfig} style={{marginTop: 20}}/>
         </Card>
       </div>
     )
