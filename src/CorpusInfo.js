@@ -335,8 +335,10 @@ class CorpusInfo extends React.Component {
           <Table columns={columns} dataSource={data} pagination={paginationConfig} style={{marginTop: 20}}/>
         </Card>
         <Modal
-          title="Basic Modal"
+          title="查重任务"
           visible={this.state.visible}
+          cancelText="取消"
+          okText="确定"
           onOk={this.handleCheckOk.bind(this)}
           onCancel={this.handleCheckCancel.bind(this)}
         >
@@ -354,6 +356,8 @@ class CorpusInfo extends React.Component {
           <Modal
               title="查重统计"
               visible={this.state.visualizationModel}
+              cancelText="取消"
+              okText="确定"
               onOk={this.handleOk}
               onCancel={this.handleCancel}
               // width='1200px'
